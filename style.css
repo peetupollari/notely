@@ -136,6 +136,8 @@ body{
   background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
 }
 
+.paper :focus{outline: none;}
+
 /* toolbar: default single-row (wide screens). On small screens it will stack into two rows */
 .toolbar{
   display:flex;
@@ -257,4 +259,5 @@ ul li::marker { font-weight:700; color: var(--muted); }
 
 .text-anim-settings{padding: 1rem 0rem;}
 .text-anim-settings h3{color: var(--text); text-align: left; font-weight: 400; font-size: 1rem;}
+
 .text-anim-settings span{color: var(--text); text-align: left; font-weight: 700;}
