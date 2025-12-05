@@ -264,5 +264,6 @@ ul li::marker { font-weight:700; color: var(--muted); }
 
 /* tighter line gap for selected blocks */
 .tight-lines {
-  line-height: 1.05 !important;
+  line-height: 0.8 !important;
 }
+
