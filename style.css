@@ -61,8 +61,8 @@ body{
 .logosvg{stroke: var(--accent); stroke-width: 3.5rem;}
 .brand-name{font-weight:700;font-size:16px}
 .brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
-.icon-btn{border:1px solid var(--border);background:var(--surface);padding:8px 10px;border-radius:10px;cursor:pointer;margin-left:8px;color:var(--muted)}
-.icon-btn:hover{transform:translateY(-1px);color:var(--text)}
+.icon-btn{transition: 200ms; border:1px solid var(--border);background:var(--surface);padding:8px 10px;border-radius:10px;cursor:pointer;margin-left:8px;color:var(--muted)}
+.icon-btn:hover{transform:translateY(-1px);color:var(--text); border-color: var(--muted);}
 
 /* hamburger */
 .hamburger{display:none;background:transparent;border:none;padding:6px;margin-right:4px;cursor:pointer}
@@ -114,10 +114,11 @@ body{
 .search-wrap{display:flex;align-items:center;gap:8px;background:transparent;padding:6px;border-radius:10px}
 .search{border:none;background:transparent;outline:none;font-size:14px;color:var(--muted);width:100%}
 .sidebar-actions{display:flex;gap:8px;margin-top:6px}
-.btn{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px; color: var(--text);}
+.btn{transition: 200ms; padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px; color: var(--text);}
 .btn.primary{background:linear-gradient(180deg,var(--surface-strong),var(--surface));color:var(--text)}
 .btn.ghost{background:transparent}
 .small{font-size:13px;color:var(--muted)}
+.btn:hover{transform:translateY(-1px);color:var(--text); border: 1px solid var(--muted);}
 
 /* notes list */
 .note-list{overflow:auto;display:flex;flex-direction:column;gap:8px;padding-right:6px}
@@ -152,8 +153,8 @@ body{
 
 /* tools row is a group of buttons (wraps if needed) */
 .tools-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1}
-.tool-btn{background:transparent;border:none;padding:8px;border-radius:8px;cursor:pointer;color:var(--muted);min-width:38px;display:inline-flex;align-items:center;justify-content:center}
-.tool-btn:hover{background:rgba(0,0,0,0.03);color:var(--text)}
+.tool-btn{transition: 200ms; background:transparent;border: 1px solid transparent;padding:8px;border-radius:8px;cursor:pointer;color:var(--muted);min-width:38px;display:inline-flex;align-items:center;justify-content:center}
+.tool-btn:hover{transform:translateY(-1px);color:var(--text); border: 1px solid var(--muted);}
 .tool-btn .fa{font-size:15px}
 .tool-btn.active{ background: var(--accent); color: #fff; }
 
@@ -259,5 +260,5 @@ ul li::marker { font-weight:700; color: var(--muted); }
 
 .text-anim-settings{padding: 1rem 0rem;}
 .text-anim-settings h3{color: var(--text); text-align: left; font-weight: 400; font-size: 1rem;}
-
 .text-anim-settings span{color: var(--text); text-align: left; font-weight: 700;}
+
