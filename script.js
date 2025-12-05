@@ -15,7 +15,10 @@ const DEFAULT_SHORTCUTS = {
   insertOrderedList: { ctrl:true, shift:true, alt:false, key:'n' },
   dashList: { ctrl:true, shift:false, alt:false, key:'-' },
   h1: { ctrl:true, shift:true, alt:false, key:'1' },
-  h2: { ctrl:true, shift:true, alt:false, key:'2' }
+  h2: { ctrl:true, shift:true, alt:false, key:'2' },
+
+  // NEW: tight lines shortcut (Ctrl/Cmd + Alt + T)
+  tightLines: { ctrl:true, shift:false, alt:true, key:'t' }
 };
 
 /* --- Robust storage wrapper (prefers localStorage, falls back to IndexedDB, then memory) --- */
@@ -166,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const emptyState = document.getElementById('empty-state');
   const paperWrap = document.getElementById('paper-wrap');
   const emptyCreate = document.getElementById('empty-create');
-  const toolbarButtons = document.querySelectorAll('.tool-btn');
+  let toolbarButtons = document.querySelectorAll('.tool-btn');
   const hamburgerBtn = document.getElementById('hamburger-btn');
   const mobileOverlay = document.getElementById('mobile-overlay');
 
@@ -174,6 +177,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   const confirmBody = document.getElementById('confirm-body');
   const confirmCancel = document.getElementById('confirm-cancel');
   const confirmOk = document.getElementById('confirm-ok');
+
+  /* inject minimal CSS for .tight-lines so user doesn't need to edit style.css */
+  (function ensureTightLinesCSS() {
+    const id = 'frosted-tight-lines-style';
+    if(document.getElementById(id)) return;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `
+      /* tighter line gap for selected blocks (adjust value to taste) */
+      .tight-lines { line-height: 1.05 !important; }
+    `;
+    document.head.appendChild(style);
+  })();
+
+  /* ensure tight-lines button exists: create if missing and insert after italic button */
+  (function ensureTightButton() {
+    if(document.getElementById('tight-lines-btn')) return;
+    const toolbar = document.querySelector('.toolbar .tools-row');
+    if(!toolbar) return;
+    // find italic button to insert after
+    const italicBtn = toolbar.querySelector('[data-command="italic"]');
+    const btn = document.createElement('button');
+    btn.className = 'tool-btn';
+    btn.id = 'tight-lines-btn';
+    btn.title = 'Toggle tight line gap';
+    btn.setAttribute('aria-pressed', 'false');
+    btn.innerHTML = '<i class="fa-solid fa-compress"></i>';
+    if(italicBtn && italicBtn.parentNode) italicBtn.parentNode.insertBefore(btn, italicBtn.nextSibling);
+    else toolbar.appendChild(btn);
+    // refresh toolbarButtons NodeList reference
+    toolbarButtons = document.querySelectorAll('.tool-btn');
+  })();
 
   /* utilities */
   function uid(){ return 'n-' + Date.now() + '-' + Math.floor(Math.random()*10000); }
@@ -649,17 +684,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  function applyActionForShortcut(action){
-    switch(action){
-      case 'dashList': toggleDashList(); break;
-      case 'h1': toggleFormatBlock('<h1>'); break;
-      case 'h2': toggleFormatBlock('<h2>'); break;
-      case 'insertUnorderedList': toggleUnorderedList(false); break;
-      case 'insertOrderedList': toggleOrderedList(); break;
-      default: document.execCommand(action, false, null);
-    }
-    editor.focus();
+function applyActionForShortcut(action){
+  switch(action){
+    case 'dashList': toggleDashList(); break;
+    case 'h1': toggleFormatBlock('<h1>'); break;
+    case 'h2': toggleFormatBlock('<h2>'); break;
+    case 'insertUnorderedList': toggleUnorderedList(false); break;
+    case 'insertOrderedList': toggleOrderedList(); break;
+
+    // NEW: keyboard shortcut action
+    case 'tightLines': toggleTightLineGap(); break;
+
+    default: document.execCommand(action, false, null);
   }
+  editor.focus();
+}
+
 
   /* caret helpers */
   function insertTextAtCursor(text){
@@ -729,6 +769,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   /* toolbar active state update */
   function updateToolbarState(){
+    // update each standard toolbar button as before
     toolbarButtons.forEach(btn => {
       const cmd = btn.dataset.command || '';
       if(['bold','italic','justifyLeft','justifyCenter','justifyRight'].includes(cmd)){
@@ -773,6 +814,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(ul && ul.classList.contains('dash-list')) isDash = true;
       }
       if(isDash) dashListBtn.classList.add('active'); else dashListBtn.classList.remove('active');
+    }
+
+    // TIGHT LINES button active/aria-pressed state
+    const tightBtn = document.getElementById('tight-lines-btn');
+    if(tightBtn){
+      try {
+        if(isSelectionTight()) {
+          tightBtn.classList.add('active');
+          tightBtn.setAttribute('aria-pressed', 'true');
+        } else {
+          tightBtn.classList.remove('active');
+          tightBtn.setAttribute('aria-pressed', 'false');
+        }
+      } catch(e) {
+        tightBtn.classList.remove('active');
+        tightBtn.setAttribute('aria-pressed', 'false');
+      }
     }
   }
 
@@ -914,6 +972,85 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   if(mobileOverlay) mobileOverlay.addEventListener('click', ()=> closeMobileSidebar());
 
+  /* --- TIGHT LINE-GAP TOGGLE IMPLEMENTATION --- */
+
+  // Get the block elements (p, div, li, h1, h2, h3, blockquote) touched by the current selection
+  function getSelectedBlockElements() {
+    if(!editor) return [];
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return [];
+    const range = sel.getRangeAt(0);
+
+    function findBlock(node) {
+      while(node && node !== editor) {
+        if(node.nodeType === 1) {
+          const name = node.nodeName.toLowerCase();
+          if(['p','div','li','h1','h2','h3','blockquote'].includes(name)) return node;
+        }
+        node = node.parentNode;
+      }
+      return editor;
+    }
+
+    const startBlock = findBlock(range.startContainer);
+    const endBlock = findBlock(range.endContainer);
+
+    if(startBlock === endBlock) return [startBlock];
+
+    const allBlocks = Array.from(editor.querySelectorAll('p,div,li,h1,h2,h3,blockquote'));
+    const startIndex = allBlocks.indexOf(startBlock);
+    const endIndex = allBlocks.indexOf(endBlock);
+    if(startIndex === -1 || endIndex === -1) {
+      return [startBlock];
+    }
+    const from = Math.min(startIndex, endIndex);
+    const to = Math.max(startIndex, endIndex);
+    const result = [];
+    for(let i = from; i <= to; i++) result.push(allBlocks[i]);
+    return result;
+  }
+
+  function isSelectionTight() {
+    const blocks = getSelectedBlockElements();
+    if(!blocks.length) return false;
+    return blocks.every(b => b && b.classList && b.classList.contains('tight-lines'));
+  }
+
+  function toggleTightLineGap() {
+    const blocks = getSelectedBlockElements();
+    if(!blocks.length) return;
+    const makeTight = !isSelectionTight();
+    blocks.forEach(b => {
+      if(!b || b === editor) return;
+      if(makeTight) b.classList.add('tight-lines');
+      else b.classList.remove('tight-lines');
+    });
+    scheduleSave();
+    setTimeout(updateToolbarState, 30);
+    editor.focus();
+  }
+
+  const tightLinesBtn = document.getElementById('tight-lines-btn');
+  if(tightLinesBtn) {
+    tightLinesBtn.addEventListener('mousedown', e => e.preventDefault());
+    tightLinesBtn.addEventListener('click', (e) => {
+      toggleTightLineGap();
+    });
+  }
+
+  /* caret placement helper (kept near the end) */
+  function placeCaretAtStartOrEnd(node, end = true){
+    try {
+      node.focus?.();
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      range.collapse(!end ? true : false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch(e){}
+  }
+
   /* ensure toolbar & visibility on load (small delay like original) */
   setTimeout(()=> {
     renderNotesList();
@@ -921,17 +1058,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(activeColor) applyColorForTyping(activeColor);
     else resetColorTyping();
   }, 60);
-
-  /* caret placement helper */
-  function placeCaretAtStartOrEnd(node, end = true){
-    node.focus?.();
-    const range = document.createRange();
-    range.selectNodeContents(node);
-    range.collapse(!end ? true : false);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
 
   /* --- Initialization: load storage, shortcuts and theme --- */
   (async function boot(){
