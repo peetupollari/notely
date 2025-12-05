@@ -262,3 +262,7 @@ ul li::marker { font-weight:700; color: var(--muted); }
 .text-anim-settings h3{color: var(--text); text-align: left; font-weight: 400; font-size: 1rem;}
 .text-anim-settings span{color: var(--text); text-align: left; font-weight: 700;}
 
+/* tighter line gap for selected blocks */
+.tight-lines {
+  line-height: 1.05 !important;
+}
