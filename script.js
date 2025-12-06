@@ -187,6 +187,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     style.textContent = `
       /* tighter line gap for selected blocks (adjust value to taste) */
       .tight-lines { line-height: 1.05 !important; }
+
+      /*
+        LISTS: make lists inherit the editor's line-height so lists match normal text.
+        When we apply .tight-lines to a list container (ul/ol) the li children receive the same
+        tight spacing via the selector below.
+      */
+      #editor ul, #editor ol { line-height: inherit; }
+      #editor ul.tight-lines li,
+      #editor ol.tight-lines li { line-height: 1.05 !important; }
+
+      /* Backwards-compat: if a script/old code adds .tight-lines to individual li */
+      #editor li.tight-lines { line-height: 1.05 !important; }
+
+      /* keep default list layout but avoid large default margins that can look odd */
+      #editor ul, #editor ol { margin: 0 0 0 1.25em; padding: 0; }
     `;
     document.head.appendChild(style);
   })();
@@ -240,7 +255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const el = document.createElement('div'); el.className='note-item'; if(store.currentId===n.id) el.classList.add('active');
       el.dataset.id = n.id;
       const meta = document.createElement('div'); meta.className='note-meta';
-      const t = document.createElement('div'); t.className='note-title'; t.textContent = n.title || 'Untitled';
+      const t = document.createElement('div'); t.className = 'note-title'; t.textContent = n.title || 'Untitled';
       const s = document.createElement('div'); s.className='note-snippet'; s.textContent = stripTags(n.content || '').slice(0,90);
       meta.appendChild(t); meta.appendChild(s);
       el.appendChild(meta);
@@ -1013,7 +1028,16 @@ function applyActionForShortcut(action){
   function isSelectionTight() {
     const blocks = getSelectedBlockElements();
     if(!blocks.length) return false;
-    return blocks.every(b => b && b.classList && b.classList.contains('tight-lines'));
+    return blocks.every(b => {
+      if(!b) return false;
+      const name = b.nodeName.toLowerCase();
+      if(name === 'li') {
+        const list = b.closest('ul,ol');
+        return list && list.classList && list.classList.contains('tight-lines');
+      }
+      // normal block-level element
+      return b.classList && b.classList.contains('tight-lines');
+    });
   }
 
   function toggleTightLineGap() {
@@ -1022,8 +1046,21 @@ function applyActionForShortcut(action){
     const makeTight = !isSelectionTight();
     blocks.forEach(b => {
       if(!b || b === editor) return;
-      if(makeTight) b.classList.add('tight-lines');
-      else b.classList.remove('tight-lines');
+      const name = b.nodeName.toLowerCase();
+      if(name === 'li') {
+        // toggle the whole list container for consistency
+        const list = b.closest('ul,ol');
+        if(!list) return;
+        if(makeTight) list.classList.add('tight-lines');
+        else list.classList.remove('tight-lines');
+      } else if(name === 'ul' || name === 'ol') {
+        // if somehow a list container was returned
+        if(makeTight) b.classList.add('tight-lines');
+        else b.classList.remove('tight-lines');
+      } else {
+        if(makeTight) b.classList.add('tight-lines');
+        else b.classList.remove('tight-lines');
+      }
     });
     scheduleSave();
     setTimeout(updateToolbarState, 30);
