@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const el = document.createElement('div'); el.className='note-item'; if(store.currentId===n.id) el.classList.add('active');
       el.dataset.id = n.id;
       const meta = document.createElement('div'); meta.className='note-meta';
-      const t = document.createElement('div'); t.className = 'note-title'; t.textContent = n.title || 'Untitled';
+      const t = document.createElement('div'); t.className='note-title'; t.textContent = n.title || 'Untitled';
       const s = document.createElement('div'); s.className='note-snippet'; s.textContent = stripTags(n.content || '').slice(0,90);
       meta.appendChild(t); meta.appendChild(s);
       el.appendChild(meta);
