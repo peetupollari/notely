@@ -75,19 +75,23 @@
       <section class="editor-area" aria-label="Editor">
         <div id="empty-state" class="empty-state hidden">
           <div class="empty-card">
-            <h3>Start creating notes</h3>
-            <p>Create your first note — everything is stored locally in your browser.</p>
-            <!-- Text type anim -->
-            <div class="text-anim"><h3>To change text color type: "<span class="auto-type"></span>", <br>To return to normal text color type: "##".</h3></div>
-            <script>
-              var typed = new Typed(".auto-type",{
-                strings : ["#blue", "#red", "#green"],
-                typeSpeed : 150,
-                backSpeed : 100,
-                loop : true
-              })
-            </script>
-            <!-- -->
+              <h3>Start creating notes</h3>
+              <p>Create your first note — everything is stored locally in your browser.</p>
+              <!-- Text type anim -->
+              <div class="text-anim"><h3>To change text color type: "<span class="auto-type"></span>", <br>To return normal text color type: "//".</h3></div>
+              <script>
+                var typed = new Typed(".auto-type",{
+                  strings : ["/blue", "/red", "/green"],
+                  typeSpeed : 150,
+                  backSpeed : 100,
+                  loop : true
+                })
+              </script>
+              <!-- -->
+              <!-- Markdowns -->
+              <div class="text-mark"><h3>For H1 text, type: "#"<br>For H2 text, type: "##"<br>For H3 text, type: "###"<br>For italic text, type: "*text*"<br>For bold text, type: "**text**"</h3></div>
+              <!--  -->
+
             <div style="margin-top:16px">
               <button id="empty-create" class="btn primary"><i class="fa-solid fa-plus"></i> Create note</button>
             </div>
@@ -192,7 +196,11 @@
 
       <div class="shortcuts-grid" id="shortcuts-grid"></div>
 
-      <div class="text-anim-settings"><h3>To change text color type: "<span>#color</span>", <br>To return to normal text color type: "##".</h3></div>
+      <div class="text-anim-settings"><h3>To change text color type: "<span>/color</span>", <br>To return to normal text color type: "//".</h3></div>
+
+      <!-- Markdowns -->
+      <div class="text-mark-settings"><h3>For H1 text, type: "#"<br>For H2 text, type: "##"<br>For H3 text, type: "###"<br>For italic text, type: "*text*"<br>For bold text, type: "**text**"</h3></div>
+      <!--  -->
 
       <div class="settings-actions">
         <button id="close-settings" class="btn">Close</button>
@@ -204,7 +212,4 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
-
 
