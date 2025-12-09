@@ -187,21 +187,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     style.textContent = `
       /* tighter line gap for selected blocks (adjust value to taste) */
       .tight-lines { line-height: 1.05 !important; }
-
-      /*
-        LISTS: make lists inherit the editor's line-height so lists match normal text.
-        When we apply .tight-lines to a list container (ul/ol) the li children receive the same
-        tight spacing via the selector below.
-      */
-      #editor ul, #editor ol { line-height: inherit; }
-      #editor ul.tight-lines li,
-      #editor ol.tight-lines li { line-height: 1.05 !important; }
-
-      /* Backwards-compat: if a script/old code adds .tight-lines to individual li */
-      #editor li.tight-lines { line-height: 1.05 !important; }
-
-      /* keep default list layout but avoid large default margins that can look odd */
-      #editor ul, #editor ol { margin: 0 0 0 1.25em; padding: 0; }
     `;
     document.head.appendChild(style);
   })();
@@ -295,6 +280,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     showPaper();
     focusEditor();
     updateToolbarState();
+    // refresh tooltips since shortcuts may have been loaded
+    updateToolbarTooltips();
   }
   function deleteCurrentNote(){
     if(!store.currentId) return;
@@ -388,42 +375,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  function toggleFormatBlock(tagWithBrackets){
-    const tag = tagWithBrackets.replace(/<|>/g,'').toLowerCase();
-    const sel = window.getSelection();
-    if(!sel.rangeCount){
-      document.execCommand('formatBlock', false, tagWithBrackets);
+  function toggleFormatBlock(tagWithBrackets) {
+  const tag = tagWithBrackets.replace(/<|>/g,'').toLowerCase();
+  const sel = window.getSelection();
+
+  if (!sel.rangeCount) {
+    document.execCommand('formatBlock', false, tagWithBrackets);
+    setTimeout(updateToolbarState, 20);
+    return;
+  }
+
+  let node = sel.anchorNode;
+  if (node.nodeType === 3) node = node.parentNode;
+
+  // Find nearest block element
+  let block = node.closest ? node.closest('p,div,h1,h2,h3,li,blockquote') : null;
+
+  if (!block) {
+    // fallback: create a paragraph if no block exists
+    block = document.createElement('p');
+    block.innerHTML = '<br>';
+    node.parentNode.insertBefore(block, node);
+    placeCaretAtStartOrEnd(block, true);
+  }
+
+  const headingAncestor = block.closest('h1,h2,h3');
+
+  if (headingAncestor) {
+    const currentTag = headingAncestor.nodeName.toLowerCase();
+    if (currentTag === tag) {
+      // convert to paragraph
+      const p = document.createElement('p');
+      p.innerHTML = headingAncestor.innerHTML || '<br>';
+      headingAncestor.parentNode.replaceChild(p, headingAncestor);
+      placeCaretAtStartOrEnd(p, true);
+      normalizeAroundNode(p);
+      scheduleSave();
+      setTimeout(updateToolbarState, 20);
+      return;
+    } else {
+      // replace heading with requested heading
+      const newHeading = document.createElement(tag);
+      newHeading.innerHTML = headingAncestor.innerHTML || '<br>';
+      headingAncestor.parentNode.replaceChild(newHeading, headingAncestor);
+      placeCaretAtStartOrEnd(newHeading, true);
+      scheduleSave();
       setTimeout(updateToolbarState, 20);
       return;
     }
-    let node = sel.anchorNode;
-    if(node.nodeType === 3) node = node.parentNode;
-
-    const headingAncestor = node && node.closest ? node.closest('h1,h2,h3') : null;
-
-    if(headingAncestor){
-      const currentTag = headingAncestor.nodeName.toLowerCase();
-      if(currentTag === tag){
-        const p = document.createElement('p');
-        p.innerHTML = headingAncestor.innerHTML || '<br>';
-        headingAncestor.parentNode.replaceChild(p, headingAncestor);
-        placeCaretAtStartOrEnd(p, true);
-        scheduleSave();
-        setTimeout(updateToolbarState, 20);
-        return;
-      } else {
-        const newHeading = document.createElement(tag);
-        newHeading.innerHTML = headingAncestor.innerHTML || '<br>';
-        headingAncestor.parentNode.replaceChild(newHeading, headingAncestor);
-        placeCaretAtStartOrEnd(newHeading, true);
-        scheduleSave();
-        setTimeout(updateToolbarState, 20);
-        return;
-      }
+    } else {
+      // wrap current block in heading
+      const newHeading = document.createElement(tag);
+      newHeading.innerHTML = block.innerHTML || '<br>';
+      block.parentNode.replaceChild(newHeading, block);
+      placeCaretAtStartOrEnd(newHeading, true);
+      scheduleSave();
+      setTimeout(updateToolbarState, 20);
+      return;
     }
-
-    document.execCommand('formatBlock', false, `<${tag}>`);
-    setTimeout(()=>{ scheduleSave(); updateToolbarState(); }, 40);
   }
 
   /* === LIST LOGIC (create at current block) === */
@@ -450,6 +459,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           if(isDash) { ul.classList.add('dash-list'); ul.style.listStyleType='none'; }
           else { ul.classList.remove('dash-list'); ul.style.listStyleType=''; }
         }
+        // normalize after exiting nested lists
+        normalizeAroundSelection();
         scheduleSave(); updateToolbarState();
       }, 12);
       return;
@@ -488,13 +499,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if(ul){
         if(ul.classList.contains('dash-list') && normalBullet){
           ul.classList.remove('dash-list'); ul.style.listStyleType='';
-          scheduleSave(); updateToolbarState(); return;
+          // normalize surrounding blocks into paragraphs
+          setTimeout(()=> { normalizeAroundSelection(); scheduleSave(); updateToolbarState(); }, 12);
+          return;
         }
         document.execCommand('insertUnorderedList');
         setTimeout(()=> {
           let n = sel.anchorNode; if(n && n.nodeType === 3) n = n.parentNode;
           const newUl = n && n.closest ? n.closest('ul') : null;
           if(newUl) newUl.classList.remove('dash-list');
+          // When list toggles off, ensure the resulting block(s) are paragraphs not divs
+          normalizeAroundSelection();
           scheduleSave(); updateToolbarState();
         }, 10);
         return;
@@ -510,7 +525,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const ol = node && node.closest ? node.closest('ol') : null;
       if(ol){
         document.execCommand('insertOrderedList');
-        scheduleSave(); updateToolbarState(); return;
+        setTimeout(()=> { normalizeAroundSelection(); scheduleSave(); updateToolbarState(); }, 10);
+        return;
       }
     }
     createListAtCurrentBlock('ol', false);
@@ -531,6 +547,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let node = (window.getSelection().anchorNode); if(node && node.nodeType === 3) node = node.parentNode;
         const ul = node && node.closest ? node.closest('ul') : null;
         if(ul) ul.classList.remove('dash-list');
+        normalizeAroundSelection();
         scheduleSave(); updateToolbarState();
       }, 10);
       return;
@@ -573,11 +590,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     activeColor = null;
     try { editor.focus(); } catch(e){}
     try {
+      // Reset CSS typing and fore color to default
       document.execCommand('foreColor', false, getEditorDefaultColor());
       document.execCommand('styleWithCSS', false, false);
     } catch (err) {
       // ignore
     }
+    // Clean up any empty colored spans that could propagate
+    cleanupEmptyColoredSpans();
   }
 
   function insertColoredSpanAtRange(range, colorStr){
@@ -585,6 +605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     span.setAttribute('data-colored', 'true');
     span.setAttribute('data-color', colorStr);
     span.style.color = colorStr;
+    // put an empty text node so caret sits inside
     const txt = document.createTextNode('\u200B');
     span.appendChild(txt);
     range.deleteContents();
@@ -614,6 +635,90 @@ document.addEventListener('DOMContentLoaded', async () => {
     return true;
   }
 
+  function cleanupEmptyColoredSpans(){
+    if(!editor) return;
+    const spans = Array.from(editor.querySelectorAll('span[data-colored]'));
+    spans.forEach(s => {
+      // if span only contains zero-width or whitespace, remove it
+      // const txt = (s.textContent || '').replace(/\u200B/g, '').trim();
+      // if(txt.length === 0){
+      //   const parent = s.parentNode;
+      //   const replacement = document.createTextNode('');
+      //   parent.replaceChild(replacement, s);
+      // }
+    });
+  }
+
+  /* helper: convert DIV -> P in the vicinity of selection (fixes divs after lists) */
+  function normalizeAroundSelection(){
+    const sel = window.getSelection();
+    const node = (sel && sel.rangeCount) ? sel.anchorNode : null;
+    if(node) normalizeAroundNode(node);
+    else normalizeWholeEditor();
+  }
+
+  // Convert a node's nearest block ancestor from DIV -> P (only when safe)
+  function normalizeAroundNode(node){
+    try {
+      let block = node;
+      while(block && block !== editor){
+        if(block.nodeType === 1){
+          const name = block.nodeName.toLowerCase();
+          if(['p','div','li','h1','h2','h3','blockquote'].includes(name)) break;
+        }
+        block = block.parentNode;
+      }
+      if(!block || block === editor) return;
+      // if block is div, convert to p
+      if(block.nodeName.toLowerCase() === 'div'){
+        const p = document.createElement('p');
+        // preserve inner HTML, but avoid moving editor-internal nodes like lists
+        p.innerHTML = block.innerHTML || '<br>';
+        block.parentNode.replaceChild(p, block);
+        placeCaretAtStartOrEnd(p, true);
+      }
+    } catch(e){ /* ignore */ }
+  }
+
+  // Fallback normalization: scan for direct divs under editor and convert to paragraphs (safe)
+  function normalizeWholeEditor(){
+    try {
+      const divs = Array.from(editor.querySelectorAll('div'));
+      divs.forEach(d => {
+        // skip divs that are inside lists or special elements
+        if(d.closest('ul,ol,blockquote')) return;
+        // skip divs that are not direct content (sanity)
+        const p = document.createElement('p');
+        p.innerHTML = d.innerHTML || '<br>';
+        d.parentNode.replaceChild(p, d);
+      });
+    } catch(e){}
+  }
+
+  /* helper: insert nodes from HTML at a range (keeps it small and focused) */
+  function insertHtmlAtRange(range, html){
+    const frag = document.createDocumentFragment();
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    while(div.firstChild) frag.appendChild(div.firstChild);
+    range.deleteContents();
+    const lastInserted = frag.lastChild;
+    range.insertNode(frag);
+    // place caret after lastInserted
+    const newRange = document.createRange();
+    if(lastInserted){
+      try {
+        newRange.setStartAfter(lastInserted);
+      } catch(e){
+        newRange.selectNodeContents(editor); newRange.collapse(false);
+      }
+    } else {
+      newRange.selectNodeContents(editor); newRange.collapse(false);
+    }
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(newRange);
+  }
+
   /* key handling in editor */
   if(editor){
     editor.addEventListener('keydown', (e)=>{
@@ -631,16 +736,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Tab inserts spaces
       if(e.key === 'Tab'){ e.preventDefault(); insertTextAtCursor('\u00a0\u00a0\u00a0\u00a0'); scheduleSave(); updateToolbarState(); return; }
 
-      // '##' exit token logic for '#'
-      if(e.key === '#'){
+      /* ---------- Slash and heading behavior ---------- */
+      // If user types '/' check for exit color token '//' or toggling heading back if inside a heading
+      if(e.key === '/'){
         const sel = window.getSelection(); if(!sel.rangeCount) return;
         const range = sel.getRangeAt(0);
         const info = getTextBeforeCaretInBlock(range);
         if(!info) return;
         const t = info.textBefore;
-        if(t.endsWith('#')){
+        // exit color-mode when '//' typed
+        if(t.endsWith('/')){
           e.preventDefault();
-          deleteNCharsBeforeCaret(range, 1); // remove previous '#'
+          deleteNCharsBeforeCaret(range, 1); // remove previous '/'
           const nodeAt = window.getSelection().anchorNode;
           const unwrapped = unwrapColoredSpanIfInside(nodeAt);
           if(!unwrapped) resetColorTyping();
@@ -648,9 +755,53 @@ document.addEventListener('DOMContentLoaded', async () => {
           updateToolbarState();
           return;
         }
+
+        // If inside a heading and press '/', toggle heading back to paragraph (only for h1-h3)
+        try {
+          let node = window.getSelection().anchorNode;
+          if(node && node.nodeType === 3) node = node.parentNode;
+          const headingAncestor = node && node.closest ? node.closest('h1,h2,h3') : null;
+          if(headingAncestor){
+            e.preventDefault();
+            // Convert heading back to paragraph
+            const p = document.createElement('p');
+            p.innerHTML = headingAncestor.innerHTML || '<br>';
+            headingAncestor.parentNode.replaceChild(p, headingAncestor);
+            placeCaretAtStartOrEnd(p, true);
+            normalizeAroundNode(p);
+            scheduleSave();
+            updateToolbarState();
+            return;
+          }
+        } catch(err) {
+          // ignore
+        }
       }
 
-      // On Space: list tokens and color token (#name or #hex)
+      /* ---------- Enter key: ensure color doesn't carry into new lines ---------- */
+      if(e.key === 'Enter'){
+        // after native handling, run normalization to avoid colored spans being carried
+        setTimeout(()=>{
+          try {
+            const sel = window.getSelection();
+            const node = sel && sel.anchorNode ? sel.anchorNode : null;
+            if(node){
+              // if inside colored span, unwrap it
+              if(node.closest && node.closest('span[data-colored]')) {
+                unwrapColoredSpanIfInside(node);
+              }
+              // normalize any DIV created by browser
+              normalizeAroundSelection();
+            }
+            // ensure typing color reset if user exited color mode before Enter
+            if(!activeColor) resetColorTyping();
+            scheduleSave();
+          } catch(e){}
+        }, 0);
+        return; // allow default Enter behaviour first (we normalized afterwards)
+      }
+
+      /* ---------- Space key: lists, headings, colors, inline markdown ---------- */
       if(e.key === ' '){
         const sel = window.getSelection(); if(!sel.rangeCount) return;
         const range = sel.getRangeAt(0);
@@ -658,7 +809,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(!info) return;
         const t = info.textBefore.replace(/\u00a0/g,' ').replace(/\r/g,'').replace(/\n/g,'');
 
-        // list triggers
+        // --- LIST TRIGGERS ---
         const mBullet = t.match(/^\s*(\*|-)\s*$/);
         const mNumber = t.match(/^\s*([0-9]+)\.\s*$/);
         if(mBullet){
@@ -675,8 +826,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-        // COLOR token detection
-        const colorTokenMatch = t.match(/#([a-zA-Z]+|[0-9a-fA-F]{3,6})$/);
+        // --- HEADING TRIGGERS: # + Space => <h1>, ## => <h2>, ### => <h3> (limit to 1..3)
+        const mHeading = t.match(/^\s*(#{1,3})\s*$/);
+        if(mHeading){
+          e.preventDefault();
+          const tokenLen = mHeading[0].length;
+          deleteNCharsBeforeCaret(range, tokenLen);
+          const level = Math.min(3, mHeading[1].length);
+          toggleFormatBlock(`<h${level}>`);
+          return;
+        }
+
+        // --- COLOR TOKEN DETECTION: starts with '/' instead of '#'
+        const colorTokenMatch = t.match(/\/([a-zA-Z]+|[0-9a-fA-F]{3,6})$/);
         if(colorTokenMatch){
           const token = colorTokenMatch[0];
           const raw = colorTokenMatch[1];
@@ -695,25 +857,65 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
           }
         }
+
+        // --- INLINE MARKDOWN: Bold **word** and Italic *word* (applies on finishing token) ---
+        // Check for bold first (longer token)
+        const boldMatch = t.match(/(\*\*([^\*]+?)\*\*)$/);
+        if(boldMatch){
+          e.preventDefault();
+          const token = boldMatch[1];
+          const inner = boldMatch[2];
+          deleteNCharsBeforeCaret(range, token.length);
+          const sel2 = window.getSelection();
+          const r2 = sel2.getRangeAt(0);
+          insertHtmlAtRange(r2, `<strong>${escapeHtml(inner)}</strong>&nbsp;`);
+          scheduleSave();
+          updateToolbarState();
+          return;
+        }
+        // italic
+        const italicMatch = t.match(/(\*([^*]+?)\*)$/);
+        if(italicMatch){
+          e.preventDefault();
+          const token = italicMatch[1];
+          const inner = italicMatch[2];
+          deleteNCharsBeforeCaret(range, token.length);
+          const sel2 = window.getSelection();
+          const r2 = sel2.getRangeAt(0);
+          insertHtmlAtRange(r2, `<em>${escapeHtml(inner)}</em>&nbsp;`);
+          scheduleSave();
+          updateToolbarState();
+          return;
+        }
+
+        // otherwise fall through to normal space key
       }
+
+      // No special handling — let rest happen
+    });
+
+    // Additional safety: whenever selection changes or input occurs, remove trailing zero-width colored spans that might persist
+    editor.addEventListener('keyup', () => {
+      cleanupEmptyColoredSpans();
+      normalizeAroundSelection(); // softly normalize to p when possible
     });
   }
 
-function applyActionForShortcut(action){
-  switch(action){
-    case 'dashList': toggleDashList(); break;
-    case 'h1': toggleFormatBlock('<h1>'); break;
-    case 'h2': toggleFormatBlock('<h2>'); break;
-    case 'insertUnorderedList': toggleUnorderedList(false); break;
-    case 'insertOrderedList': toggleOrderedList(); break;
+  function applyActionForShortcut(action){
+    switch(action){
+      case 'dashList': toggleDashList(); break;
+      case 'h1': toggleFormatBlock('<h1>'); break;
+      case 'h2': toggleFormatBlock('<h2>'); break;
+      case 'insertUnorderedList': toggleUnorderedList(false); break;
+      case 'insertOrderedList': toggleOrderedList(); break;
 
-    // NEW: keyboard shortcut action
-    case 'tightLines': toggleTightLineGap(); break;
+      // NEW: keyboard shortcut action
+      case 'tightLines': toggleTightLineGap(); break;
 
-    default: document.execCommand(action, false, null);
+      default: document.execCommand(action, false, null);
+    }
+    editor.focus();
   }
-  editor.focus();
-}
 
 
   /* caret helpers */
@@ -735,7 +937,7 @@ function applyActionForShortcut(action){
       while(block && block !== editor){
         if(block.nodeType === 1){
           const name = block.nodeName.toLowerCase();
-          if(['p','div','li','h1','h2','h3','blockquote'].includes(name)) break;
+          if(['p','div','li','h1','h2','h3','h4','h5','h6','blockquote'].includes(name)) break;
         }
         block = block.parentNode;
       }
@@ -751,7 +953,7 @@ function applyActionForShortcut(action){
         if(n.nodeType === 3) textBefore += n.textContent;
         else {
           const name = n.nodeName.toLowerCase();
-          if(['div','p','br','li','h1','h2','h3'].includes(name)) textBefore += '\n';
+          if(['div','p','br','li','h1','h2','h3','h4','h5','h6'].includes(name)) textBefore += '\n';
           for(let i=0;i<n.childNodes.length;i++){
             if(walk(n.childNodes[i])) return true;
           }
@@ -776,6 +978,11 @@ function applyActionForShortcut(action){
       return;
     }
     for(let i=0;i<n;i++) document.execCommand('delete', false, null);
+  }
+
+  /* small helper to safely escape HTML for text insertion */
+  function escapeHtml(s){
+    return (s+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   /* save on input */
@@ -929,6 +1136,8 @@ function applyActionForShortcut(action){
           input.value = mappingToString(map);
           window.removeEventListener('keydown', handler, true);
           input.blur();
+          // update the tooltips since shortcuts changed
+          updateToolbarTooltips();
         }
         window.addEventListener('keydown', handler, true);
         input.addEventListener('blur', ()=> window.removeEventListener('keydown', handler, true), { once:true });
@@ -941,6 +1150,7 @@ function applyActionForShortcut(action){
     shortcuts = JSON.parse(JSON.stringify(DEFAULT_SHORTCUTS));
     Storage.setJSON(SHORTCUTS_KEY, shortcuts).catch(()=>{});
     populateShortcutsUI();
+    updateToolbarTooltips();
   });
   function mappingToString(m){
     if(!m) return '';
@@ -950,6 +1160,52 @@ function applyActionForShortcut(action){
     if(m.alt) parts.push('Alt');
     parts.push((m.key||'').toUpperCase());
     return parts.join(' + ');
+  }
+
+  /* update toolbar button titles to show shortcut & markdown */
+  function updateToolbarTooltips(){
+    toolbarButtons = document.querySelectorAll('.tool-btn'); // refresh
+    const commandToMarkdown = {
+      bold: '**bold**',
+      italic: '*italic*',
+      insertUnorderedList: '- item  OR  * item',
+      insertOrderedList: '1. item',
+      dashList: '- item (dash list)',
+      formatBlock_h1: '# + Space → H1',
+      formatBlock_h2: '## + Space → H2',
+      formatBlock_h3: '### + Space → H3',
+      tightLines: '(toggle) tight lines',
+    };
+
+    toolbarButtons.forEach(btn=>{
+      const cmd = btn.dataset.command || '';
+      let md = '';
+      if(cmd === 'formatBlock'){
+        const val = (btn.dataset.value || '').toLowerCase().replace(/<|>/g,'');
+        md = commandToMarkdown['formatBlock_' + val] || (val ? `${val.toUpperCase()} (format)` : '');
+      } else {
+        md = commandToMarkdown[cmd] || '';
+      }
+      // Determine label for shortcut if present
+      let sc = '';
+      // map dataset.command -> shortcuts key name
+      let shortcutKeyName = null;
+      if(cmd === 'formatBlock'){
+        const val = (btn.dataset.value || '').toLowerCase().replace(/<|>/g,'');
+        if(val && val.startsWith('h')) shortcutKeyName = 'h' + val.replace('h',''); // e.g. h1 maps to 'h1'
+      } else {
+        shortcutKeyName = cmd; // many command names match shortcut keys
+      }
+      if(shortcutKeyName && shortcuts[shortcutKeyName]) sc = mappingToString(shortcuts[shortcutKeyName]);
+
+      // build title (tooltip)
+      const parts = [];
+      if(btn.getAttribute('aria-label')) parts.push(btn.getAttribute('aria-label'));
+      if(sc) parts.push(`Shortcut: ${sc}`);
+      if(md) parts.push(`Markdown: ${md}`);
+      const title = parts.join(' — ');
+      if(title) btn.setAttribute('title', title);
+    });
   }
 
   /* paste sanitize */
@@ -989,7 +1245,7 @@ function applyActionForShortcut(action){
 
   /* --- TIGHT LINE-GAP TOGGLE IMPLEMENTATION --- */
 
-  // Get the block elements (p, div, li, h1, h2, h3, blockquote) touched by the current selection
+  // Get the block elements (p, div, li, h1, h2, h3, blockquote, etc.) touched by the current selection
   function getSelectedBlockElements() {
     if(!editor) return [];
     const sel = window.getSelection();
@@ -1028,16 +1284,7 @@ function applyActionForShortcut(action){
   function isSelectionTight() {
     const blocks = getSelectedBlockElements();
     if(!blocks.length) return false;
-    return blocks.every(b => {
-      if(!b) return false;
-      const name = b.nodeName.toLowerCase();
-      if(name === 'li') {
-        const list = b.closest('ul,ol');
-        return list && list.classList && list.classList.contains('tight-lines');
-      }
-      // normal block-level element
-      return b.classList && b.classList.contains('tight-lines');
-    });
+    return blocks.every(b => b && b.classList && b.classList.contains('tight-lines'));
   }
 
   function toggleTightLineGap() {
@@ -1046,21 +1293,8 @@ function applyActionForShortcut(action){
     const makeTight = !isSelectionTight();
     blocks.forEach(b => {
       if(!b || b === editor) return;
-      const name = b.nodeName.toLowerCase();
-      if(name === 'li') {
-        // toggle the whole list container for consistency
-        const list = b.closest('ul,ol');
-        if(!list) return;
-        if(makeTight) list.classList.add('tight-lines');
-        else list.classList.remove('tight-lines');
-      } else if(name === 'ul' || name === 'ol') {
-        // if somehow a list container was returned
-        if(makeTight) b.classList.add('tight-lines');
-        else b.classList.remove('tight-lines');
-      } else {
-        if(makeTight) b.classList.add('tight-lines');
-        else b.classList.remove('tight-lines');
-      }
+      if(makeTight) b.classList.add('tight-lines');
+      else b.classList.remove('tight-lines');
     });
     scheduleSave();
     setTimeout(updateToolbarState, 30);
@@ -1094,6 +1328,7 @@ function applyActionForShortcut(action){
     updateToolbarState();
     if(activeColor) applyColorForTyping(activeColor);
     else resetColorTyping();
+    updateToolbarTooltips();
   }, 60);
 
   /* --- Initialization: load storage, shortcuts and theme --- */
@@ -1139,6 +1374,10 @@ function applyActionForShortcut(action){
 
     // ensure typing color matches theme on load
     if(activeColor) applyColorForTyping(activeColor); else resetColorTyping();
+
+    // ensure tooltips reflect loaded shortcuts
+    updateToolbarTooltips();
   })();
 
 });
+
