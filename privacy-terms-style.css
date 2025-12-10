@@ -1,0 +1,136 @@
+/* ===== Shared styles for Notely — full-viewport, minimal, elegant ===== */
+
+:root{
+  --header-height:72px;
+  --bg: #f4f7f8;
+  --surface: rgba(255,255,255);
+  --muted: #6b7280;
+  --text: #0f1724;
+  --accent: #4fb3b3;
+  --border: rgba(15,23,36,0.08);
+  --paper-bg: rgba(255, 255, 255, 0.95);
+  --radius: 14px;
+  --gap: 20px;
+  --toolbar-height:64px;
+  --sidebar-width: 320px;
+  --mobile-break: 1000px;
+  --max-content-width: 980px;
+  --readable-width: 760px;
+  --muted-2: #9aa6b2;
+  --accent-2: #3fb0b0;
+  --soft-divider: rgba(15,23,36,0.06);
+}
+
+/* Reset & base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  line-height:1.5;
+}
+
+/* topbar */
+.topbar{
+  height:var(--header-height);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px calc(1.5 * var(--gap));
+  border-bottom:1px solid var(--soft-divider);
+  backdrop-filter: blur(6px);
+}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:40px;height:40px; padding: 0.3rem; border-radius:10px;background:var(--surface-strong);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);box-shadow:var(--shadow);border:1px solid var(--border)}
+.logosvg{stroke: var(--accent); stroke-width: 3.5rem;}
+.brand-name{font-weight:700;font-size:16px;letter-spacing: -0.02em}
+.brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* header actions */
+.header-actions{display:flex;gap:10px;align-items:center}
+.icon-btn{text-decoration: none; transition: 160ms; border:1px solid transparent;background:transparent;padding:8px 10px;border-radius:10px;cursor:pointer;margin-left:8px;color:var(--muted)}
+.icon-btn:hover{text-decoration: none; transform:translateY(-2px);color:var(--text); border-color: var(--soft-divider);}
+
+/* page container */
+.container{
+  padding:28px;
+  flex:1;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  gap:24px;
+}
+
+/* main content column (no filled card or shadow) */
+.content {
+  width:100%;
+  max-width: var(--max-content-width);
+  padding:28px;
+  border-radius:12px;
+  background: transparent; /* explicit: no filled color */
+  box-shadow: none;         /* explicit: no shadow */
+  border: none;             /* no border */
+}
+
+/* subtle narrow column for readable text */
+.article {
+  max-width: var(--readable-width);
+  margin: 0 auto;
+  padding: 28px;
+  background: rgba(255,255,255,0.0); /* keep transparent */
+  border-radius: 10px;
+}
+
+/* heading styles */
+.kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  color:var(--accent);
+  font-weight:800;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  margin-bottom:10px;
+  font-size: 1.6rem;
+}
+h1{margin:0 0 8px 0;font-size:1.5rem;font-weight:700}
+.lead{margin:4px 0 18px 0;color:var(--muted);font-size:14px}
+
+/* typographic scale for sections */
+h2{font-size:1rem;margin:20px 0 8px 0}
+p{margin:10px 0;color:var(--muted);font-size:15px}
+.small{font-size:13px;color:var(--muted)}
+
+/* lists & code */
+ul{margin:8px 0 8px 1.2rem;color:var(--muted)}
+code{background:transparent;padding:2px 6px;border-radius:6px;border:1px solid var(--soft-divider);font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; font-size:13px;color:var(--text)}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;color:var(--accent-2)}
+
+/* decorative divider */
+.divider{height:1px;background:var(--soft-divider);margin:20px 0;border-radius:2px}
+
+/* footer */
+.footer{display:flex;flex-direction:column;gap:12px;padding-top:18px;border-top:1px solid var(--soft-divider);margin-top:18px}
+.footer-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.footer-links{display:flex;gap:12px;flex-wrap:wrap}
+.footer-link{color:var(--muted);text-decoration:none;font-size:13px}
+.footer-link:hover{color:var(--text);text-decoration:underline}
+
+/* responsiveness */
+@media (max-width:760px){
+  .container{padding:18px}
+  .article{padding:18px}
+  h1{font-size:1.25rem}
+  .brand-name{font-size:15px}
+}
+
+/* accessibility helpers */
+.visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px, 1px, 1px, 1px);white-space:nowrap}
