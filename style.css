@@ -311,3 +311,19 @@ ul li::marker { font-weight:700; color: var(--muted); }
   color: var(--muted);
 }
 
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .footer-links {
+    align-items: center;
+  }
+}
+
+
+
