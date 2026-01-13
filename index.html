@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="google-adsense-account" content="ca-pub-9900726677777998">
+  <meta name="google-site-verification" content="66wpj-TL4-2D-OHyEWu3dnEEIG-ob139PegPf1FAitc" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Notely - Minimal free browser notes with markdown features</title>
+  <meta name="description" content="Notely - a minimal free online notepad that autosaves to your browser. Create offline notes with markdown-style formatting - focused on efficiency - no account required." />
+  <link class="logosvg" rel="icon" type="Image/x-icon" href="logo.svg">
+  <link class="logosvg" rel="icon" href="logo.svg/favicon.ico" sizes="32x32">
+  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FSK7K26GBW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FSK7K26GBW');
+</script>
+
+<body>
+  <div class="root">
+    <header class="topbar" role="banner">
+      <div class="brand">
+        <button id="sidebar-toggle-btn" class="icon-btn sidebar-toggle" aria-pressed="false" title="Toggle sidebar" aria-label="Toggle sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="5" y="5" width="3" height="14" rx="1" fill="currentColor"/>
+            <path d="M15 16l-3-3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </button>
+
+        <div class="toolbar" role="toolbar" aria-label="Editor toolbar">
+              <div class="title-row">
+                <div class="title-wrap" title="Note title">
+                  <input id="note-title" class="note-title-input" placeholder="Untitled" />
+                  <!-- Mobile tools toggle placed next to the title input so it sits on the right -->
+                  <button id="mobile-tools-toggle" class="icon-btn mobile-tools-toggle" aria-haspopup="true" aria-expanded="false" title="Tools">
+                    <svg class="mobile-tools-arrow" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="tools-row" role="group" aria-label="Editor tools">
+                <button class="tool-btn" data-command="bold" title="Bold (Ctrl/Cmd+B)"><i class="fa-solid fa-bold"></i></button>
+                <button class="tool-btn" data-command="italic" title="Italic (Ctrl/Cmd+I)"><i class="fa-solid fa-italic"></i></button>
+
+                <button class="tool-btn" data-command="formatBlock" data-value="<h1>" title="Heading 1"><i class="fa-solid fa-heading"></i><sup>1</sup></button>
+                <button class="tool-btn" data-command="formatBlock" data-value="<h2>" title="Heading 2"><i class="fa-solid fa-heading"></i><sup>2</sup></button>
+
+                <button class="tool-btn" id="tight-lines-btn" title="Toggle tight line gap" aria-pressed="false">
+                    <i class="fa-solid fa-compress-lines"></i>
+                    <?xml version="1.0" encoding="UTF-8"?>
+                      <svg width="16" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+                        <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 6h18"/>
+                          <path d="M3 9h18"/>
+                          <path d="M6 15h12"/>
+                          <path d="M6 18h12"/>
+                          <path d="M9 13v2"/>
+                          <path d="M15 13v2"/>
+                        </g>
+                      </svg>
+                  </button>
+
+                <button class="tool-btn" data-command="insertUnorderedList" title="Bullet list"><i class="fa-solid fa-list-ul"></i></button>
+                <button class="tool-btn" id="dash-list-btn" title="Dash list (-)" aria-label="Dash list">
+                <!-- three lines with dash markers -->
+                <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+                  <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                    <!-- dash marker + short line for each row -->
+                    <path d="M2 4h2" />   <!-- dash -->
+                    <path d="M6 4h10" />  <!-- text line -->
+                    <path d="M2 9h2" />
+                    <path d="M6 9h10" />
+                    <path d="M2 14h2" />
+                    <path d="M6 14h10" />
+                  </g>
+                </svg>
+              </button>
+                <button class="tool-btn" data-command="insertOrderedList" title="Numbered list"><i class="fa-solid fa-list-ol"></i></button>
+
+                <button class="tool-btn" data-command="justifyLeft" title="Align left"><i class="fa-solid fa-align-left"></i></button>
+                <button class="tool-btn" data-command="justifyCenter" title="Align center"><i class="fa-solid fa-align-center"></i></button>
+                <button class="tool-btn" data-command="justifyRight" title="Align right"><i class="fa-solid fa-align-right"></i></button>
+              </div>
+            </div>
+        <!-- <div class="logo">
+          <?xml version="1.0" encoding="utf-8"?>
+          <svg xmlns="http://www.w3.org/2000/svg" width="1106" height="1034" viewBox="0 0 1106 1034">
+            <g id="previewTransform" transform="translate(564.06 501.49) scale(1.58) translate(-553 -517)">
+              <path class="logosvg" d="M 256 356 Q 256 256 356 256 L 732 256 Q 832 256 832 356 L 832 700 Q 832 800 732 800 L 356 800 Q 256 800 256 700 L 256 356 Z" fill="none" stroke="#4fb3b3" stroke-width="3.5rem" stroke-linecap="round" stroke-linejoin="round"/>
+              <path class="logosvg" d="M 832 496 Q 832 544 832 544 Q 832 592 802.0146377173876 629.4817028532655 L 787.9902415217416 647.012198097823 Q 768 672 736 672 L 736 672 Q 704 672 704 704 L 704 718.0588745030457 Q 704 752 680 776 L 680 776 Q 656 800 622.0588745030457 800 L 576 800 L 576 800" fill="none" stroke="#4fb3b3" stroke-width="3.5rem" stroke-linecap="round" stroke-linejoin="round"/>
+              <path class="logosvg" d="M 352 352 L 480 352" fill="none" stroke="#4fb3b3" stroke-width="3.5rem" stroke-linecap="round" stroke-linejoin="round"/>
+              <path class="logosvg" d="M 352 448 L 416 448" fill="none" stroke="#4fb3b3" stroke-width="3.5rem" stroke-linecap="round" stroke-linejoin="round"/>
+              <path class="logosvg" d="M 384 704 Q 384 704 384 704 L 512 704 Q 512 704 512 704 L 732.2229123600034 483.77708763999664 Q 768 448 752 400 L 752 400 Q 736 352 688 336 L 688 336 Q 640 320 604.2229123600034 355.77708763999664 L 384 576 Q 384 576 384 576 L 384 704 Z" fill="none" stroke="#4fb3b3" stroke-width="3.5rem" stroke-linecap="round" stroke-linejoin="round"/>
+              <path class="logosvg" d="M 576 384 L 704 512" fill="none" stroke="#4fb3b3" stroke-width="3.5rem" stroke-linecap="round" stroke-linejoin="round"/>
+              <path class="logosvg" d="M 416 544 Q 448 544 448 544 Q 480 544 480 576 L 480 608 Q 480 608 480 608 L 512 608 Q 544 608 544 640 L 544 672 L 544 672" fill="none" stroke="#4fb3b3" stroke-width="3.5rem" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </svg>
+        </div> -->
+        <!-- <div class="brand-text">
+          <div class="brand-name">Notely</div>
+          <div class="brand-sub">Simple • Autosave</div>
+        </div> -->
+      </div>
+
+      <div class="top-actions">
+        <!-- Exports/Imports removed per request -->
+        <button id="open-settings" class="icon-btn" title="Settings"><i class="fa-solid fa-cog"></i></button>
+      </div>
+    </header>
+
+    <main class="app" id="app">
+      <aside class="sidebar" aria-label="Notes sidebar">
+        <div class="sidebar-top">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input id="search-input" class="search" placeholder="Search notes" />
+          </div>
+          <div class="sidebar-actions">
+            <button id="new-note" class="btn primary"><i class="fa-solid fa-plus"></i> New</button>
+          </div>
+        </div>
+
+        <div id="notes-list" class="note-list" role="list" aria-label="Notes"></div>
+      </aside>
+
+      <section class="editor-area" aria-label="Editor">
+        <div id="empty-state" class="empty-state hidden">
+          <div class="empty-card">
+              <h3>Start creating notes</h3>
+              <p>Create your first note — everything is stored locally in your browser using IndexedDB.</p>
+              <!-- Text type anim -->
+              <div class="text-anim"><h3>To change text color type: "<span class="auto-type"></span>", <br>To return normal text color type: "//".</h3></div>
+              <script>
+                var typed = new Typed(".auto-type",{
+                  strings : ["/blue", "/red", "/green"],
+                  typeSpeed : 150,
+                  backSpeed : 100,
+                  loop : true
+                })
+              </script>
+              <!-- -->
+              <!-- Markdowns -->
+              <div class="text-mark"><h3>For H1 text, type: "#"<br>For H2 text, type: "##"<br>For H3 text, type: "###"<br>For italic text, type: "*text*"<br>For bold text, type: "**text**"</h3></div>
+              <!--  -->
+
+            <div style="margin-top:16px">
+              <button id="empty-create" class="btn primary"><i class="fa-solid fa-plus"></i> Create note</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="paper-wrap" class="paper-wrap hidden">
+          <div class="paper">
+            
+
+            <div id="editor-wrapper" class="editor-wrapper">
+              <div id="editor" class="editor" contenteditable="true" spellcheck="false" aria-label="Note editor"></div>
+            </div>
+
+            <div class="statusbar">
+              <div id="status-left" class="small">Saved</div>
+              <div class="small hint">Shortcuts configurable in Settings</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="mobile-overlay" class="mobile-overlay hidden"></div>
+
+  <div id="confirm-modal" class="confirm-modal hidden" aria-hidden="true">
+    <div class="confirm-card">
+      <div class="confirm-title">Confirm</div>
+      <div class="confirm-body" id="confirm-body">Are you sure?</div>
+      <div class="confirm-actions">
+        <button id="confirm-cancel" class="btn ghost">Cancel</button>
+        <button id="confirm-ok" class="btn primary">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-overlay" class="settings-overlay hidden" role="dialog" aria-modal="true" aria-label="Settings">
+    <div class="settings">
+      <h3>Settings</h3>
+
+      <div class="setting-row">
+        <div>Dark mode</div>
+        <label class="switch">
+          <input id="theme-toggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div style="margin-top:12px;font-weight:700">Keyboard shortcuts</div>
+      <div class="small" style="margin-bottom:8px">Click a field, hold modifiers, then press a key to record. Stored locally using IndexedDB.</div>
+
+      <div class="shortcuts-grid" id="shortcuts-grid"></div>
+
+      <div class="text-anim-settings"><h3>To change text color type: "<span>/color</span>", <br>To return to normal text color type: "//".</h3></div>
+
+      <!-- Markdowns -->
+      <div class="text-mark-settings"><h3>For H1 text, type: "#"<br>For H2 text, type: "##"<br>For H3 text, type: "###"<br>For italic text, type: "*text*"<br>For bold text, type: "**text**"</h3></div>
+      <!--  -->
+
+      <div class="settings-actions">
+        <button id="close-settings" class="btn">Close</button>
+        <button id="reset-shortcuts" class="btn ghost">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  
+
+
+
+
+<!-- HOWTO + PRACTICE (insert immediately after </main> and before <footer>) -->
+<section class="howto-section" aria-label="How to use Notely - Practice">
+  <!-- Top: short site explanation -->
+  <div class="howto-intro">
+    <h2>About Notely</h2>
+    <p>
+      Notely saves notes locally in your browser using IndexedDB (no account required). Notes auto-save as you type and persist on the same device & browser. Clearing browser data will remove your notes.
+    </p>
+    <p class="small-note">Use the toolbar or type markdown-like shortcuts directly in the editor. The exercises below help you practice those shortcuts.</p>
+  </div>
+
+  <!-- Practice rows (explanation + minigame). They alternate layout for variety -->
+  <div class="practice-rows">
+
+    <!-- Row 1: Headings -->
+    <div class="row">
+      <div class="explain">
+        <h3>Headings</h3>
+        <p>Type <code>#</code> at the start of a line, then press <strong>space</strong>. The <code>#</code> will be removed and the line becomes a level-1 heading.</p>
+      </div>
+      <div class="game">
+        <div class="task-card" data-task="heading">
+          <div class="task-title">Heading (H1)</div>
+          <div class="task-edit practice-edit" contenteditable="true" aria-label="Heading practice" data-task="heading" spellcheck="false" placeholder="# Title"></div>
+          <div class="controls">
+            <button class="btn small" data-action="sample" data-sample="heading">Sample</button>
+            <button class="btn small" data-action="check">Check</button>
+            <button class="btn small" data-action="clear">Clear</button>
+            <div class="result" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Bold -->
+    <div class="row">
+      <div class="game">
+        <div class="task-card" data-task="bold">
+          <div class="task-title">Bold</div>
+          <div class="task-edit practice-edit" contenteditable="true" aria-label="Bold practice" data-task="bold" spellcheck="false" placeholder="Make **this** bold"></div>
+          <div class="controls">
+            <button class="btn small" data-action="sample" data-sample="bold">Sample</button>
+            <button class="btn small" data-action="check">Check</button>
+            <button class="btn small" data-action="clear">Clear</button>
+            <div class="result" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+      <div class="explain">
+        <h3>Bold</h3>
+        <p>Type <code>**your text**</code> and press <strong>space</strong>. The stars will be hidden and the text will become bold.</p>
+      </div>
+    </div>
+
+    <!-- Row 3: Italic -->
+    <div class="row">
+      <div class="explain">
+        <h3>Italic</h3>
+        <p>Wrap text with single asterisks: <code>*italic*</code>. After pressing <strong>space</strong>, the asterisks are removed and text becomes italic.</p>
+      </div>
+      <div class="game">
+        <div class="task-card" data-task="italic">
+          <div class="task-title">Italic</div>
+          <div class="task-edit practice-edit" contenteditable="true" aria-label="Italic practice" data-task="italic" spellcheck="false" placeholder="Make *this* italic"></div>
+          <div class="controls">
+            <button class="btn small" data-action="sample" data-sample="italic">Sample</button>
+            <button class="btn small" data-action="check">Check</button>
+            <button class="btn small" data-action="clear">Clear</button>
+            <div class="result" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 4: Dash list -->
+    <div class="row">
+      <div class="game">
+        <div class="task-card" data-task="dashlist">
+          <div class="task-title">Dash list</div>
+          <div class="task-edit practice-edit" contenteditable="true" aria-label="Dash list practice" data-task="dashlist" spellcheck="false" placeholder="- item"></div>
+          <div class="controls">
+            <button class="btn small" data-action="sample" data-sample="dashlist">Sample</button>
+            <button class="btn small" data-action="check">Check</button>
+            <button class="btn small" data-action="clear">Clear</button>
+            <div class="result" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+      <div class="explain">
+        <h3>Dash list</h3>
+        <p>Start a line with <code>- </code> then press <strong>space</strong>. That line will become a bullet list item (dash list).</p>
+      </div>
+    </div>
+
+    <!-- Row 5: Dot list (asterisk) -->
+    <div class="row">
+      <div class="explain">
+        <h3>Dot list (asterisk)</h3>
+        <p>Start a line with <code>* </code> then press <strong>space</strong>. This also creates an unordered list (dot-style).</p>
+      </div>
+      <div class="game">
+        <div class="task-card" data-task="dotlist">
+          <div class="task-title">Dot list (*)</div>
+          <div class="task-edit practice-edit" contenteditable="true" aria-label="Dot list practice" data-task="dotlist" spellcheck="false" placeholder="* item"></div>
+          <div class="controls">
+            <button class="btn small" data-action="sample" data-sample="dotlist">Sample</button>
+            <button class="btn small" data-action="check">Check</button>
+            <button class="btn small" data-action="clear">Clear</button>
+            <div class="result" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 6: Numbered list -->
+    <div class="row">
+      <div class="game">
+        <div class="task-card" data-task="numlist">
+          <div class="task-title">Numbered list</div>
+          <div class="task-edit practice-edit" contenteditable="true" aria-label="Numbered list practice" data-task="numlist" spellcheck="false" placeholder="1. first"></div>
+          <div class="controls">
+            <button class="btn small" data-action="sample" data-sample="numlist">Sample</button>
+            <button class="btn small" data-action="check">Check</button>
+            <button class="btn small" data-action="clear">Clear</button>
+            <div class="result" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+      <div class="explain">
+        <h3>Numbered list</h3>
+        <p>Start a line with <code>1. </code> (or any number + dot) then press <strong>space</strong>. That line becomes a numbered list item.</p>
+      </div>
+    </div>
+
+    <!-- Reset row -->
+    <div class="row reset-row">
+      <div></div>
+      <div style="display:flex;justify-content:flex-end">
+        <button id="reset-practice" class="btn ghost small">Reset all practice</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+
+
+
+
+  
+  
+</body>
+<footer class="footer">
+  <div class="footer-links">
+    <p class="footer-heading">Socials:</p>
+    <a href="https://www.instagram.com/notely.uk/" target="_blank" rel="noopener" class="footer-link">Instagram</a>
+    <a href="https://x.com/notely_uk" target="_blank" rel="noopener" class="footer-link">X (Twitter)</a>
+  </div>
+  <div class="footer-links">
+    <p class="footer-heading">Other links:</p>
+    <a href="about.html" class="footer-link" target="_blank">About</a>
+    <p><a href="privacy.html" class="footer-link" target="_blank">Privacy Policy</a> &nbsp;|&nbsp;
+    <a href="terms.html" class="footer-link" target="_blank">Terms & Conditions</a></p>
+  </div>
+</footer>
+</html>
+
+
+
+
+

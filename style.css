@@ -1,0 +1,519 @@
+/* ===== Full-viewport Frosted Notes (toolbar responsive + scrollbar polish) ===== */
+
+.hidden { display: none !important; }
+
+:root{
+  --header-height:60px;
+  --bg: #e1e5e9;
+  --surface: rgb(229, 232, 236);
+  --surface-strong: rgb(233, 235, 240);
+  --muted: #6b7280;
+  --text: #0f1724;
+  --accent: #4fb3b3;
+  --border: rgba(255, 255, 255, 0.411);
+  --paper-bg: rgba(240, 242, 245, 0.95);
+  --radius: 14px;
+  --shadow: -3px -6px 16px rgb(246, 249, 252), 3px 6px 16px rgb(194, 200, 206);
+  --gap: 20px;
+  --toolbar-height:64px;
+  --sidebar-width: 320px;
+  --mobile-break: 1000px;
+
+  /* UI tuning variables */
+  --panel-blur: 20px; /* default blur applied to translucent panels */
+  --overlay-alpha: 0.12; /* background dim amount for overlays */
+  --overlay-alpha-strong: 0.28; /* slightly stronger dim for critical modals */
+
+  /* translucent panel color (use for modals/panels) */
+  --transparent-color: rgba(255, 255, 255, 0.233);
+  --panel-border: rgba(255,255,255,0.06);
+} 
+
+body.dark-mode{
+  --header-height:55px;
+  --bg: #0d0f11;
+  --surface: rgb(14, 15, 17);
+  --surface-strong: rgb(15, 16, 19);
+  --muted: #9aa6b2;
+  --text: #e6eef1;
+  --accent: #3fb0b0;
+  --border: rgba(41, 41, 41, 0.247);
+  --paper-bg: rgb(17, 18, 20);
+  --shadow: -3px -6px 12px rgb(19, 22, 22), 3px 6px 12px rgb(4, 7, 7);
+
+  /* dark-mode transparent panel color */
+  --transparent-color: rgba(0, 0, 0, 0.534);
+  --panel-border: rgba(255,255,255,0.04);
+} 
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+/* topbar */
+.topbar{
+  height:var(--header-height);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  z-index: 50;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px; padding: 0.3rem; border-radius:10px;background:var(--surface-strong);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);box-shadow:var(--shadow);border:1px solid var(--border)}
+.logosvg{stroke: var(--accent); stroke-width: 3.5rem;}
+.brand-name{font-weight:700;font-size:16px}
+.brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.icon-btn{transition: 200ms; border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);;background:var(--surface);padding:8px 10px;border-radius:10px;cursor:pointer;margin-left:8px;color:var(--muted)}
+.icon-btn:hover{transform:translateY(-1px);color:var(--text); border-color: var(--muted);}
+
+/* sidebar toggle icon (left of top bar) */
+.icon-btn.sidebar-toggle{display:inline-flex;align-items:center;justify-content:center;padding:6px;width:36px;height:36px;margin-right:6px;color:var(--muted)}
+.icon-btn.sidebar-toggle svg{display:block;width:18px;height:18px}
+.icon-btn.sidebar-toggle:hover{color:var(--text)}
+.icon-btn.sidebar-toggle.has-svg svg path, .icon-btn.sidebar-toggle.has-svg svg rect{stroke:currentColor; fill: none}
+
+/* when sidebar is closed we remove it from layout so there's no gap */
+.root.sidebar-closed .sidebar{flex-basis:0 !important; padding:0 !important; opacity:0 !important; border:0 !important; box-shadow:none !important; min-width:0 !important; pointer-events:none !important}
+.root.sidebar-closed .mobile-overlay{display:none !important}
+.root.sidebar-closed .app{ gap: 0 !important; /* remove gap between columns to avoid leftover left space */ }
+
+/* mobile: when closed, slide it out instead of shrinking (keeps fixed positioning behavior) */
+@media (max-width:1000px){
+  .root.sidebar-closed .sidebar{transform: translateX(-120%); opacity:0; pointer-events:none}
+} 
+
+/* hamburger */
+.hamburger{display:none;background:transparent;border:none;padding:6px;margin-right:4px;cursor:pointer}
+.hamburger span{display:block;width:20px;height:2px;background:var(--muted);margin:4px 0;border-radius:2px}
+
+/* app area */
+.app {
+  margin: 0;
+  width: 100%;
+  height: calc(100vh - var(--header-height));
+  display: flex;
+  gap: var(--gap);
+  align-items: stretch;
+  padding: 20px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+
+/* sidebar */
+.sidebar{
+  width: var(--sidebar-width);
+  background:var(--surface);
+  border-radius:12px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);;
+  box-shadow: var(--shadow);
+  height:100%;
+  overflow:hidden; /* contain children when animating */
+  flex: 0 0 var(--sidebar-width);
+  transition: flex-basis 260ms ease, padding 220ms ease, opacity 220ms ease, transform 220ms ease, box-shadow 240ms ease;
+  opacity:1;
+}
+
+/* mobile off-canvas (positioned so it scrolls with document and fits in viewport) */
+.root.mobile-sidebar-open .sidebar{
+  transform: translateX(0);
+  position: absolute; /* not fixed so it scrolls with the page */
+  left: 12px;
+  top: calc(var(--header-height) + 12px);
+  z-index: 120;
+  width: min(86vw, 380px);
+  max-height: calc(100vh - var(--header-height) - 24px);
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+.sidebar { transform: translateX(0); }
+
+/* overlay for mobile */
+.mobile-overlay{ position: fixed; inset:0; background: rgba(0,0,0,0.35); z-index:110; transition: opacity 160ms ease; display:none; }
+
+/* search & buttons */
+.search-wrap{display:flex;align-items:center;gap:8px;background:transparent;padding:6px;border-radius:10px}
+.search{border:none;background:transparent;outline:none;font-size:14px;color:var(--muted);width:100%}
+.sidebar-actions{display:flex;gap:8px;margin-top:6px}
+.btn{transition: 200ms; padding:8px 10px;border-radius:10px;border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);;background:var(--surface);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px; color: var(--text);}
+.btn.primary{background: var(--surface-strong);color:var(--text)}
+.btn.ghost{background: var(--surface-strong)}
+.small{font-size:13px;color:var(--muted)}
+.btn:hover{transform:translateY(-1px);color:var(--text); border: 1px solid var(--muted);}
+
+/* notes list */
+.note-list{overflow:auto;display:flex;flex-direction:column;gap:8px;padding:18px 14px 18px 14px}
+.note-item{transition: all 200ms; display:flex;align-items:center;gap:10px;box-shadow: transparent; padding:10px;border-radius:10px;cursor:pointer;align-items:flex-start;border:1px solid transparent;background:transparent}
+.note-item:hover{transform: translateY(-1px);box-shadow:transparent; border: 1px solid var(--muted);}
+.note-item.active{transform: translateY(0px); background:var(--surface-strong);border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);box-shadow:var(--shadow)}
+.note-meta{flex:1;min-width:0}
+.note-title{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-snippet{font-size:13px;color:var(--muted);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* per-item delete button (only visible on the active note) */
+.note-delete{transition: 200ms; display:none;margin-left:8px;border:none;background:transparent;color:var(--muted);cursor:pointer;padding:8px;border-radius:8px}
+.note-delete i{font-size:14px}
+.note-item.active .note-delete{display:inline-flex;align-items:center}
+.note-delete:hover{color:var(--text);}
+
+/* editor column */
+.editor-area{flex:1;display:flex;flex-direction:column;height:100%;}
+.paper-wrap{display:flex;flex-direction:column;height:100%}
+.paper{
+  border-radius:12px;overflow:hidden;border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);;box-shadow: var(--shadow);display:flex;flex-direction:column;height:100%;
+  background: var(--surface);
+}
+
+.paper :focus{outline: none;}
+
+/* toolbar: default single-row (wide screens). On small screens it will stack into two rows */
+.toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  position:relative; /* needed so dropdown can be positioned relative to toolbar */
+}
+
+/* Mobile tools toggle and dropdown styles */
+#mobile-tools-toggle{ display:none; }
+
+/* On smaller screens replace the visible tool row with a single toggle which opens the dropdown */
+@media (max-width:1000px){
+  /* hide toolbar tools completely when closed (also non-focusable via JS) */
+  .toolbar .tools-row{ display:none !important; opacity:0; visibility:hidden; transform-origin: top right; transform: translateY(-8px); transition: opacity 180ms ease, transform 180ms ease, visibility 180ms; }
+
+  /* show a compact toggle button (smaller + aligned next to title input) */
+  #mobile-tools-toggle{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; padding:6px; border-radius:8px; margin-left:8px; }
+  .mobile-tools-toggle .mobile-tools-arrow{ transition: transform 220ms ease; display:block; width:12px; height:12px }
+  /* ensure title-wrap keeps the toggle on the right side of the input */
+  .title-wrap .mobile-tools-toggle{ margin-left:auto; }
+
+  /* when open, display the tools row as an absolute dropdown overlay anchored to the toolbar */
+  .tools-dropdown-open .toolbar .tools-row{
+    display:flex !important;
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    background:var(--surface-strong);
+    padding:10px;
+    border-radius:10px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    z-index:220;
+    max-width:95vw;
+    max-height:60vh;
+    overflow:auto;
+    gap:8px;
+    flex-wrap:wrap;
+    opacity:1;
+    visibility:visible;
+    transform: translateY(0);
+  }
+
+  /* rotate arrow when open */
+  .tools-dropdown-open #mobile-tools-toggle .mobile-tools-arrow { transform: rotate(180deg); }
+
+  /* When there are no notes, hide title and tools on all sizes */
+  .no-notes .toolbar .title-wrap,
+  .no-notes .toolbar .tools-row,
+  .no-notes #mobile-tools-toggle {
+    display:none !important;
+    opacity:0 !important;
+    visibility:hidden !important;
+  }
+
+  /* make touch targets slightly bigger in dropdown */
+  .tools-row .tool-btn{ min-width:44px; padding:10px }
+}
+
+
+/* tools row is a group of buttons (wraps if needed) */
+.tools-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1}
+.tool-btn{transition: 200ms; background:transparent;border: 1px solid transparent;padding:8px;border-radius:8px;cursor:pointer;color:var(--muted);min-width:38px;display:inline-flex;align-items:center;justify-content:center}
+.tool-btn:hover{transform:translateY(-1px);color:var(--text); border: 1px solid var(--muted);}
+.tool-btn .fa{font-size:15px}
+.tool-btn.active{ background: var(--accent); color: #fff; }
+
+.title-row{display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;margin-left:12px}
+.title-wrap{display:flex;align-items:center;padding:6px}
+.note-title-input{border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);;padding:8px 10px;border-radius:8px;background:var(--paper-bg);outline:none;font-weight:700;color:var(--text);min-width:220px;max-width:560px}
+
+/* paper & editor */
+.editor-wrapper{padding:20px;flex:1;display:flex;flex-direction:column;overflow:hidden}
+.editor{line-height: normal; background:var(--paper-bg);border-radius:10px;flex:1;padding:28px;overflow:auto;box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);border:1px solid rgba(0,0,0,0.02);font-size:16px;min-height:200px;
+    /* Ensure long/unbroken text wraps instead of pushing the paper horizontally */
+    overflow-wrap: anywhere; /* modern keyword to allow breaks within words */
+    word-wrap: break-word; /* legacy */
+    word-break: break-word; /* break long words if needed */
+    white-space: pre-wrap; /* preserve newlines but allow wrapping */
+    hyphens: auto; /* allow hyphenation where supported */
+    max-width: 100%;
+  }
+
+/* heading styles */
+.editor h1{font-size:2rem;margin:0 0 0 0}
+.editor h2{font-size:1.65rem;margin:0 0 0 0}
+.editor h3{font-size: 1.2rem;margin: 0 0 0 0;}
+.editor p{margin:0 0 0 0}
+
+/* lists: marker bold */
+ol li::marker { font-weight:700; color: var(--muted); }
+ul li::marker { font-weight:700; color: var(--muted); }
+
+/* dash-list */
+.dash-list{list-style:none;padding-left:20px;margin:0}
+.dash-list li{position:relative;padding-left:22px;margin:8px 0;line-height:1.4}
+.dash-list li::before{content:"-";position:absolute;left:0;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700}
+
+/* ensure H1 inside practice card is prominent */
+.task-card h1{font-size:1.75rem;margin:0 0 6px 0;font-weight:700}
+
+/* statusbar */
+.statusbar{display:flex;align-items:center;justify-content:space-between;padding:12px;border-top:1px solid var(--border);background:transparent}
+.statusbar .hint{opacity:0.85}
+
+/* empty state */
+.empty-state{display:flex;align-items:center;justify-content:center;height:100%}
+.empty-card{background:var(--surface-strong);border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);;padding:28px;border-radius:12px;box-shadow:var(--shadow);text-align:center}
+.empty-card h3{margin:0;font-size:18px}
+.empty-card p{margin:8px 0 0 0;color:var(--muted)}
+
+/* confirm modal */
+.confirm-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,var(--overlay-alpha-strong));z-index:120}
+.confirm-card{
+  width:360px;
+  /* theme-aware translucent background */
+  background: var(--transparent-color);
+  padding:18px;
+  border-radius:12px;
+  border-width: 1px 1px 1px 1px; border-style: solid;
+  border-color: var(--panel-border) transparent transparent var(--panel-border);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  backdrop-filter: blur(var(--panel-blur));
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+} 
+.confirm-title{font-weight:700;margin-bottom:8px}
+.confirm-body{color:var(--muted);margin-bottom:16px}
+.confirm-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* settings overlay */
+.settings-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,var(--overlay-alpha-strong));z-index:105}
+.settings{
+  width:420px;
+  border-radius:12px;
+  padding:18px;
+  background: var(--transparent-color);
+  border-width: 1px 1px 1px 1px; border-style: solid;
+  border-color: var(--panel-border) transparent transparent var(--panel-border);
+  box-shadow:0 8px 40px rgba(0,0,0,0.25);
+  backdrop-filter: blur(var(--panel-blur));
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+} 
+@media (prefers-color-scheme: dark){
+  .confirm-card, .settings{ background: var(--transparent-color); border-color: var(--panel-border) transparent transparent var(--panel-border); }
+} 
+
+/* also support manual dark-mode class toggle */
+body.dark-mode .confirm-card,
+body.dark-mode .settings {
+  background: rgba(0,0,0,0.4);
+  border-color: rgba(255,255,255,0.04) transparent transparent rgba(255,255,255,0.04);
+}
+
+
+
+.setting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.shortcut-row{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.shortcut-input{padding:8px;border-radius:8px;background:transparent;border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);;min-width:180px; color: var(--text);}
+
+/* toggle */
+.switch{position:relative;display:inline-block;width:50px;height:28px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#cfcfcf;transition:.25s;border-radius:28px}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:4px;bottom:4px;background-color:white;transition:.25s;border-radius:50%}
+.switch input:checked + .slider{background-color:var(--accent)}
+.switch input:checked + .slider:before{transform:translateX(22px)}
+
+/* scrollbars */
+
+/* width */
+::-webkit-scrollbar {
+  width: 0;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* responsive: when small, toolbar becomes two rows (tools then title) */
+@media (max-width:1000px){
+  .app{padding:12px;height:calc(100vh - var(--header-height))}
+  .sidebar{transform: translateX(-120%); position: absolute; left: 12px; top: calc(var(--header-height) + 12px); z-index:120; width: min(86vw, 380px); max-height: calc(100vh - var(--header-height) - 24px); overflow:auto; -webkit-overflow-scrolling: touch; box-sizing: border-box;}
+  .editor-area{margin-left:0;height:100%}
+  .root.mobile-sidebar-open .mobile-overlay{display:block}
+
+  /* when sidebar opens on small screens, push the editor right (so its right side goes off-screen) */
+  .editor-area{transition: transform 260ms ease}
+  .root.mobile-sidebar-open .editor-area{ transform: translateX(calc(min(86vw, 380px) + var(--gap))); }
+
+  .toolbar{align-items:stretch;}
+  .title-row{justify-content:flex-end;}
+  /* keep the title and small toggle on the same row; input flexes to fill available space */
+  .title-wrap{display:flex;align-items:center;gap:8px;width:100%}
+  .note-title-input{flex:1;min-width:0;max-width:none}
+  .note-list{max-height:calc(100vh - var(--header-height) - 220px)}
+  .editor-wrapper{padding:14px}
+  .editor{padding:18px}
+}
+
+.text-anim{padding: 2rem 0rem 0.5rem 0rem;}
+.text-anim h3{color: var(--text); text-align: left; font-weight: 400; font-size: 1rem;}
+.text-anim span{color: var(--text); text-align: left; font-weight: 400;}
+
+.text-anim-settings{padding: 0rem 0rem;}
+.text-anim-settings h3{color: var(--text); text-align: left; font-weight: 400; font-size: 1rem;}
+.text-anim-settings span{color: var(--text); text-align: left; font-weight: 700;}
+
+.text-mark{padding: 1rem 0rem 0.5rem 0rem;}
+.text-mark h3{color: var(--text); text-align: left; font-weight: 400; font-size: 1rem;}
+
+.text-mark-settings{padding: 0rem 0rem 1rem 0rem;}
+.text-mark-settings h3{color: var(--text); text-align: left; font-weight: 400; font-size: 1rem;}
+
+/* tighter line gap for selected blocks */
+.tight-lines {
+  line-height: 1.1 !important;
+}
+
+
+.footer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5rem;
+  padding: 2rem 0rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+.footer-heading{
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.footer-links{
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+}
+
+.footer-link{
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: 200ms;
+}
+
+.footer-link:hover{
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.footer p{
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .footer-links {
+    align-items: center;
+  }
+}
+
+/* ===== Practice (flat, roomy, alternating rows) ===== */
+.howto-section { padding: 28px 12px; background: transparent; }
+.howto-intro { max-width:1100px; margin: 0 auto 32px; padding: 14px; border-radius: 12px; border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);; background: var(--surface-strong); box-shadow: var(--shadow); color:var(--text); }
+.howto-intro h2 { margin: 0 0 8px 0; }
+.howto-intro p { margin: 6px 0; color:var(--muted); }
+.howto-intro .small-note { color:var(--muted); font-size:0.92rem; margin-top:6px; }
+
+/* rows container */
+.practice-rows { max-width:1100px; margin: 0 auto; display:flex; flex-direction:column; gap:32px; }
+
+/* each row is a two-column flex area; consistent layout (no reverse to avoid uneven whitespace) */
+.row { display:flex; gap:18px; align-items:stretch; flex-wrap:nowrap; }
+.explain, .game { align-self:stretch; }
+@media (max-width:1000px){ .row { flex-direction:column; gap:12px; } }
+
+/* explanation column */
+.explain { flex:1.2; background: var(--surface); border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);; border-radius:12px; padding:14px; color:var(--text); box-shadow: var(--shadow); }
+.explain h3 { margin:0 0 8px 0; }
+.explain p { margin:0; color:var(--muted); }
+
+/* game column */
+.game { flex:1; display:flex; align-items:flex-start; justify-content:flex-start; }
+.task-card { width:100%; max-width:520px; background: var(--surface-strong); border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);; border-radius:12px; padding:12px; box-shadow: var(--shadow); display:flex; flex-direction:column; justify-content:flex-start; height:100%; min-height:140px; }
+.task-title { font-weight:700; margin-bottom:8px; }
+.task-edit { flex:1; min-height:72px; padding:10px; border-radius:8px; border-width: 1px 1px 1px 1px; border-style: solid; border-color: var(--border) transparent transparent var(--border);; background:var(--paper-bg); color:var(--text); font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; outline:none; }
+.task-edit:empty:before { content: attr(placeholder); color: var(--muted); }
+
+/* card heading sizes inside practice cards */
+.task-card h1{font-size:1.75rem;margin:0 0 6px 0;font-weight:700;line-height:1.15}
+.task-card h2{font-size:1.25rem;margin:0 0 6px 0;font-weight:700}
+.task-card h3{font-size:1.05rem;margin:0 0 6px 0;font-weight:700} 
+
+/* controls and result */
+.controls { display:flex; gap:8px; align-items:center; margin-top:10px; }
+.btn.small { padding:6px 8px; font-size:0.9rem; }
+.result { margin-left:6px; min-width:120px; font-weight:700; }
+.result.ok { color:#0f9d58; }
+.result.bad { color:#d93025; }
+
+/* focused game inputs: remove prominent blue ring; use subtle neutral highlight for clarity */
+.task-edit:focus { box-shadow:none; border-color: var(--border); background: rgba(255,255,255,0.015); outline:none; }
+
+/* reset row */
+.reset-row { margin-top:4px; }
+
+
+
+/* responsive tweaks */
+@media (max-width:600px){
+  .howto-intro { padding:12px; }
+  .task-edit { min-height:56px; }
+}
