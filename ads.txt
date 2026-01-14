@@ -1,0 +1,4 @@
+curl -L "https://srv.adstxtmanager.com/19390/notely.uk" -o ads.txt
+git add ads.txt
+git commit -m "Add ads.txt for Ezoic"
+git push origin main
