@@ -451,6 +451,37 @@ body.dark-mode .settings {
   color: var(--muted);
 }
 
+/* Prominent PayPal donate button (left footer) */
+.donate-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius:999px;
+  /* gradient with accent color that gets darker */
+  background: linear-gradient(135deg, var(--accent), var(--accent) 50%);
+  border: 1px solid transparent;
+  color:#fff;
+  font-weight:800;
+  text-decoration:none;
+  box-shadow: 0 8px 20px rgba(0,112,186,0.16);
+  transition: 200ms;
+}
+.donate-btn i{ font-size: 1.05rem; }
+.donate-btn:hover, .donate-btn:focus{
+  transform: translateY(-1px);
+  border: 1px solid #65e0ff75;
+  box-shadow: 0 12px 30px rgba(0,112,186,0.22);
+  opacity:1;
+  outline: none;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 6px 18px rgba(0,112,186,0.08); }
+  50% { box-shadow: 0 10px 30px rgba(0,112,186,0.18); }
+  100% { box-shadow: 0 6px 18px rgba(0,112,186,0.08); }
+}
+
 
 
 /* Media Queries for Responsiveness */
