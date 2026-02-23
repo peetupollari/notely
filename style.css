@@ -59,6 +59,24 @@ body{
   min-height:100vh;
 }
 
+.noto-link{
+  background: var(--accent);
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--bg);
+}
+
+.noto-link a{
+  color: var(--bg);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.noto-link a:hover{
+  text-decoration: underline;
+}
+
 /* topbar */
 .topbar{
   height:var(--header-height);
@@ -548,3 +566,4 @@ body.dark-mode .settings {
   .howto-intro { padding:12px; }
   .task-edit { min-height:56px; }
 }
+
