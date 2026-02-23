@@ -937,6 +937,7 @@ b {
     margin-top: clamp(4.5rem, 14vh, 10rem);
     padding: clamp(3.2rem, 9vh, 6.2rem) clamp(1rem, 6vw, 5rem);
     border-top: var(--border);
+    height: 80vh;
     background:
         radial-gradient(120% 120% at 20% 0%, #ffffff 0%, #f6f6f6 55%, #f1f1f1 100%);
 }
