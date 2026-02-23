@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="icons/notologo.svg" sizes="32x32">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="noto.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/github-dark.min.css">
+    <title>Noto</title>
+    <link rel="icon" type="Image/x-icon" href="icons/notologo.svg">
+</head>
+
+<body class="grid-bg">
+    <div class="titlebar">
+        <a href="#hero"><img src="images/notologo-black.png"></a>
+        <div class="titlebar-links">
+            <a href="#features-stage">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#footer">Contact</a>
+            <div class="titlebar-indicator"></div>
+        </div>
+        <div class="titlebar-empty"></div>
+    </div>
+    <div class="hero" id="hero">
+        <div class="hero-title">
+            <h1>The only <mark><b>**Markdown**</b></mark> app <br> you'll ever need.</h1>
+            <p>A streamlined <b>**Markdown**</b> note app that gives you <u><i>*structure and flexibility*</i></u> <br> without the plugins, clutter, or learning curve.</p>
+            <form class="waitlist-form" id="waitlist-form" novalidate>
+                <label class="sr-only" for="waitlist-email">Email address</label>
+                <input
+                    id="waitlist-email"
+                    name="email"
+                    type="email"
+                    inputmode="email"
+                    autocomplete="email"
+                    placeholder="example@email.com"
+                    required
+                >
+                <button type="submit" id="waitlist-submit">
+                  Join waitlist
+                  <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <g clip-path="url(#clip0_4418_9833)">
+                      <path class="svg" d="M7.40005 6.32015L15.8901 3.49015C19.7001 2.22015 21.7701 4.30015 20.5101 8.11015L17.6801 16.6002C15.7801 22.3102 12.6601 22.3102 10.7601 16.6002L9.92005 14.0802L7.40005 13.2402C1.69005 11.3402 1.69005 8.23015 7.40005 6.32015Z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <path class="svg" d="M10.11 13.6505L13.69 10.0605" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_4418_9833">
+                        <rect width="24" height="24" fill="white"/>
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </button>
+            </form>
+            <p class="waitlist-status" id="waitlist-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+    
+    <div class="features-stage" id="features-stage">
+      <div class="features">
+        <div class="features-content">
+          <div class="features-image" id="features-image">
+            <img
+              id="features-image-base"
+              class="features-image-layer features-image-layer-base"
+              src="images/Screenshot 2026-02-22 020000.png"
+              alt="Noto app interface preview"
+            >
+            <img
+              id="features-image-next"
+              class="features-image-layer features-image-layer-next"
+              src="images/Screenshot 2026-02-22 020000.png"
+              alt=""
+              aria-hidden="true"
+            >
+          </div>
+          <div class="features-progress" id="features-progress" aria-hidden="true">
+            <div class="features-progress-track">
+              <div class="features-progress-fill" id="features-progress-fill"></div>
+            </div>
+            <div class="features-progress-dots" id="features-progress-dots"></div>
+          </div>
+          <div class="features-image-text" id="features-image-text" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pricing" id="pricing">
+      <div class="pricing-story" id="pricing-story" aria-live="polite">
+        <p class="pricing-story-line" id="pricing-story-line-1">
+          Noto will be available as a subscription
+          <span class="pricing-ellipsis" aria-hidden="true">
+            <span class="pricing-ellipsis-dot">.</span><span class="pricing-ellipsis-dot">.</span><span class="pricing-ellipsis-dot">.</span>
+          </span>
+        </p>
+        <p class="pricing-story-line" id="pricing-story-line-2">
+          And the price is
+          <span class="pricing-ellipsis" aria-hidden="true">
+            <span class="pricing-ellipsis-dot">.</span><span class="pricing-ellipsis-dot">.</span><span class="pricing-ellipsis-dot">.</span>
+          </span>
+        </p>
+      </div>
+      <p class="pricing-float-price" id="pricing-float-price">
+        <span class="pricing-float-price-amount" id="pricing-float-price-amount">$5.99</span>
+        <span class="pricing-float-price-suffix">/month</span>
+      </p>
+
+      <div class="pricing-layout" id="pricing-layout">
+        <div class="pricing-price-slot" id="pricing-price-slot" data-target-price="1.59"></div>
+        <div class="pricing-text">
+          <h2 class="pricing-reveal-line">Simple, transparent pricing.</h2>
+          <p class="pricing-reveal-line">No more guessing games. Just one straightforward plan giving you access to everything.</p>
+          <p class="pricing-reveal-line">All features included. Cancel anytime.</p>
+          <p class="pricing-reveal-line waitlist-snippet">Join the waitlist to be notified when we launch.</p>
+          <form class="waitlist-form pricing-reveal-line" id="waitlist-form" novalidate>
+                <label class="sr-only" for="waitlist-email">Email address</label>
+                <input
+                    id="waitlist-email"
+                    name="email"
+                    type="email"
+                    inputmode="email"
+                    autocomplete="email"
+                    placeholder="example@email.com"
+                    required
+                >
+                <button type="submit" id="waitlist-submit">
+                  Join waitlist
+                  <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <g clip-path="url(#clip0_4418_9833)">
+                      <path class="svg" d="M7.40005 6.32015L15.8901 3.49015C19.7001 2.22015 21.7701 4.30015 20.5101 8.11015L17.6801 16.6002C15.7801 22.3102 12.6601 22.3102 10.7601 16.6002L9.92005 14.0802L7.40005 13.2402C1.69005 11.3402 1.69005 8.23015 7.40005 6.32015Z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <path class="svg" d="M10.11 13.6505L13.69 10.0605" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_4418_9833">
+                        <rect width="24" height="24" fill="white"/>
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </button>
+            </form>
+            <p class="waitlist-status" id="waitlist-status" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+    
+    
+    <footer id="footer" class="contact-section">
+      <div class="contact-shell">
+        <section class="contact-intro">
+          <p class="contact-kicker">Get in touch</p>
+          <h2>Tell us what would make Noto better for you.</h2>
+          <p class="contact-copy">
+            Questions, feedback, bug reports, or feature ideas are all welcome.
+            Send us a message and we will get back to you as soon as possible.
+          </p>
+          <!-- <div class="contact-meta">
+            <p><strong>Typical reply time:</strong> within 24 hours</p>
+          </div> -->
+        </section>
+
+        <section class="contact-form-wrap" aria-label="Contact form">
+          <form class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+            <input type="hidden" name="access_key" value="f80b5202-87cc-4edc-9d8a-d47b2ef4a8b8">
+            <input type="hidden" name="subject" value="Noto Website Contact Form">
+
+            <label class="contact-field">
+              <span>Name</span>
+              <input type="text" name="name" placeholder="Your name" required>
+            </label>
+
+            <label class="contact-field">
+              <span>Email</span>
+              <input type="email" name="email" placeholder="you@example.com" required>
+            </label>
+
+            <label class="contact-field">
+              <span>Message</span>
+              <textarea name="message" rows="5" placeholder="What would you like to share?" required></textarea>
+            </label>
+
+            <!-- <button type="submit" class="contact-submit">Send message</button> -->
+            <button type="submit" class="contact-submit">
+              Send message
+              <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <g clip-path="url(#clip0_4418_9833)">
+                  <path class="svg" d="M7.40005 6.32015L15.8901 3.49015C19.7001 2.22015 21.7701 4.30015 20.5101 8.11015L17.6801 16.6002C15.7801 22.3102 12.6601 22.3102 10.7601 16.6002L9.92005 14.0802L7.40005 13.2402C1.69005 11.3402 1.69005 8.23015 7.40005 6.32015Z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  <path class="svg" d="M10.11 13.6505L13.69 10.0605" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </g>
+                <defs>
+                    <clipPath id="clip0_4418_9833">
+                    <rect width="24" height="24" fill="white"/>
+                  </clipPath>
+                </defs>
+              </svg>
+            </button>
+            <p class="contact-note">We only use this to respond to your message.</p>
+          </form>
+        </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nav = document.querySelector('.titlebar-links');
+            const links = Array.from(nav?.querySelectorAll('a') ?? []);
+            const indicator = nav?.querySelector('.titlebar-indicator');
+            const sectionLinks = links
+                .map((link) => {
+                    const href = link.getAttribute('href') ?? '';
+                    if (!href.startsWith('#') || href.length < 2) return null;
+                    const target = document.querySelector(href);
+                    if (!target) return null;
+                    return { link, target };
+                })
+                .filter(Boolean);
+
+            if (!nav || !links.length || !indicator) return;
+
+            let active = links[0];
+            let scrollSyncQueued = false;
+            active.classList.add('active');
+
+            const setActive = (link) => {
+                if (!link || link === active) return;
+                active.classList.remove('active');
+                active = link;
+                active.classList.add('active');
+            };
+
+            const moveTo = (link) => {
+                const linkRect = link.getBoundingClientRect();
+                const navRect = nav.getBoundingClientRect();
+                indicator.style.width = `${linkRect.width}px`;
+                indicator.style.transform = `translateX(${linkRect.left - navRect.left}px)`;
+                indicator.style.opacity = 1;
+            };
+
+            const syncActiveFromScroll = () => {
+                if (!sectionLinks.length) {
+                    moveTo(active);
+                    return;
+                }
+
+                const probeY = window.scrollY + (window.innerHeight * 0.38);
+                let currentLink = sectionLinks[0].link;
+
+                sectionLinks.forEach(({ link, target }) => {
+                    const sectionTop = window.scrollY + target.getBoundingClientRect().top;
+                    if (sectionTop <= probeY) currentLink = link;
+                });
+
+                setActive(currentLink);
+                moveTo(active);
+            };
+
+            const requestScrollSync = () => {
+                if (scrollSyncQueued) return;
+                scrollSyncQueued = true;
+                window.requestAnimationFrame(() => {
+                    scrollSyncQueued = false;
+                    syncActiveFromScroll();
+                });
+            };
+
+            links.forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    setActive(link);
+                    moveTo(link);
+
+                    const href = link.getAttribute('href') ?? '';
+                    if (!href.startsWith('#') || href.length < 2) return;
+                    if (href === '#pricing') return;
+
+                    const target = document.querySelector(href);
+                    if (!target) return;
+
+                    event.preventDefault();
+                    window.__notoNavJumpLockUntil = performance.now() + 1200;
+                    const targetY = window.scrollY + target.getBoundingClientRect().top;
+                    window.scrollTo({
+                        top: targetY,
+                        behavior: 'auto'
+                    });
+                    requestScrollSync();
+                });
+            });
+
+            nav.addEventListener('mouseleave', () => moveTo(active));
+            nav.addEventListener('focusout', (event) => {
+                if (!nav.contains(event.relatedTarget)) {
+                    moveTo(active);
+                }
+            });
+            window.addEventListener('scroll', requestScrollSync, { passive: true });
+            window.addEventListener('resize', requestScrollSync);
+
+            requestScrollSync();
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [["$", "$"], ["\\(", "\\)"]],
+          displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+        },
+        svg: {
+          fontCache: "global"
+        }
+      };
+    </script>
+    <script id="mathjax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script id="hljs-script" defer src="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/lib/common.min.js"></script>
+    <script src="noto.js"></script>
+</body>
+</html>

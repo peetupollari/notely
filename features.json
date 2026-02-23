@@ -1,0 +1,101 @@
+{
+  "features": [
+    {
+      "id": "live-markdown",
+      "title": "Live Markdown (stays readable while you edit)",
+      "description": "Noto renders basic Markdown with some extensions like tables, task lists, and math blocks along with raw HTML.",
+      "points": [
+        ""
+      ],
+      "image": "images/Screenshot 2026-02-23 014638.png"
+    },
+    {
+      "id": "raw-html-layouts",
+      "title": "Raw HTML inside notes = unlimited layouts",
+      "description": "Drop in HTML when Markdown is not enough - build your own note templates and custom sections.",
+      "points": [
+        ""
+      ],
+      "image": "images/Screenshot 2026-02-23 014711.png",
+      "markdown": "<details>\n  <summary>HTML inside markdown</summary>\n  <p><mark>Custom HTML</mark> renders live in the editor.</p>\n</details>\n\n<p><mark>Markdown and HTML together</mark> gives you the best of both worlds.</p>"
+    },
+    {
+      "id": "slash-menu",
+      "title": "Slash menu for instant commands and snippets",
+      "description": "Type / and insert what you need - no memorizing all the syntax.",
+      "points": [
+        "Headings, lists, tables, links, dividers, callouts",
+        "HTML snippets: details, mark, colored text"
+      ],
+      "image": "images/Screenshot 2026-02-23 014734.png"
+    },
+    {
+      "id": "interactive-checklists",
+      "title": "Interactive checklists",
+      "description": "Turn notes into action - check tasks off directly in the editor.",
+      "points": [
+        ""
+      ],
+      "image": "images/Screenshot 2026-02-23 014638.png",
+      "markdown": "- [x] Create landing page.\n - [ ] Finish noto"
+    },
+    {
+      "id": "math-rendering",
+      "title": "Math that actually renders",
+      "description": "Write equations in LaTeX - get clean math output.",
+      "points": [
+        "Inline math and block equations"
+      ],
+      "image": "images/Screenshot 2026-02-23 015038.png",
+      "markdown": "Inline math: $E=mc^2$\n\nBlock math:\n$$\n\\frac{d}{dx}f(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}\n$$"
+    },
+    {
+      "id": "code-highlighting",
+      "title": "Code blocks with highlighting",
+      "description": "Whether you're jotting down a quick snippet or building a full code reference, Noto's got you covered.",
+      "points": [
+        "Syntax highlighting in rendered code blocks",
+        "Inline code for quick references"
+      ],
+      "image": "images/Screenshot 2026-02-23 015106.png"
+    },
+    {
+      "id": "multi-pane-workspace",
+      "title": "Multi-pane workspace",
+      "description": "Keep multiple notes open and work the way your brain works.",
+      "points": [
+        "Open tabs side-by-side across panes",
+        "Keep a reference note visible while you write"
+      ],
+      "image": "images/Screenshot 2026-02-23 015146.png"
+    },
+    {
+      "id": "global-search",
+      "title": "Global file search",
+      "description": "Jump to any file fast - no digging through folders.",
+      "points": [
+        "Toggle search panel with a shortcut"
+      ],
+      "image": "images/Screenshot 2026-02-23 015204.png"
+    },
+    {
+      "id": "folder-tree",
+      "title": "Clean and simple folder tree",
+      "description": "Organize like real files - because they are real files.",
+      "points": [
+        ""
+      ],
+      "image": "images/Screenshot 2026-02-23 014638.png"
+    },
+    {
+      "id": "presentation-mode",
+      "title": "Presentation mode (with live updates and scroll sync)",
+      "description": "Turn any note into a clean presentation instantly.",
+      "points": [
+        "Pick a display and present the current note",
+        "Live content updates + synchronized scrolling"
+      ],
+      "image": "images/Screenshot 2026-02-23 015220.png"
+    }
+  ]
+}
