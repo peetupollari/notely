@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const forms = Array.from(document.querySelectorAll(".waitlist-form"));
     if (!forms.length) return;
 
-    const SUPABASE_URL = "MY_SUPABASE_URL";
-    const SUPABASE_ANON_KEY = "MY_SUPABASE_ANON_KEY";
+    const SUPABASE_URL = "https://hrsjiejhvrlfjuzbxzgv.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyc2ppZWpodnJsZmp1emJ4emd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NzM0MDksImV4cCI6MjA4NzM0OTQwOX0.5G1nKpGhtUnF9fQr2bOIKgJMG8BDX8OFsiIMKYTEORY";
 
     const setStatus = (statusElement, message, tone = "info") => {
         if (!statusElement) return;
