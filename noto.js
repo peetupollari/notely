@@ -1451,17 +1451,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const pinPriceToSlot = () => {
-        setPriceAmount(targetPrice);
-        if (floatPrice.parentElement !== pricing) pricing.appendChild(floatPrice);
-        const pricingRect = pricing.getBoundingClientRect();
-        const slotRect = priceSlot.getBoundingClientRect();
-        const x = (slotRect.left - pricingRect.left) + (slotRect.width / 2);
-        const y = (slotRect.top - pricingRect.top) + (slotRect.height / 2);
-        floatPrice.style.left = `${x}px`;
-        floatPrice.style.top = `${y}px`;
-        floatPrice.style.transform = "translate3d(-50%, -50%, 0) scale(1)";
-        floatPrice.style.opacity = "1";
-        floatPrice.style.filter = "blur(0px)";
+        const premiumPriceElement = document.getElementById("premium-price-amount");
+        if (premiumPriceElement) {
+            premiumPriceElement.style.position = "static";
+            premiumPriceElement.textContent = formatPrice(targetPrice);
+        }
     };
 
     const hasPricingEnteredViewport = () => {
@@ -1560,12 +1554,56 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     };
 
+    // Animate the price morphing inside the premium card only
+    const animatePriceMorphInCard = () => new Promise((resolve) => {
+        const premiumPriceElement = document.getElementById("premium-price-amount");
+        if (!premiumPriceElement) {
+            resolve();
+            return;
+        }
+        // Get the free card price font size for parity
+        const freePrice = document.querySelector('.pricing-card--free .pricing-card-price-amount');
+        const staticFontSize = freePrice ? window.getComputedStyle(freePrice).fontSize : window.getComputedStyle(premiumPriceElement).fontSize;
+        premiumPriceElement.style.fontSize = staticFontSize;
+        premiumPriceElement.style.opacity = "1";
+        // Morph the price from teaser to target with custom ease (slow-fast-slow)
+        const startTime = performance.now();
+        const durationMs = 1800;
+        const easeInOutBack = (t) => {
+            // Custom ease: slow start, fast middle, slow end
+            const c1 = 1.70158;
+            const c2 = c1 * 1.525;
+            return t < 0.5
+                ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
+                : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+        };
+        const step = (timestamp) => {
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / durationMs, 1);
+            const eased = easeInOutBack(progress);
+            const currentPrice = teaserPrice + ((targetPrice - teaserPrice) * eased);
+            premiumPriceElement.textContent = formatPrice(currentPrice);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+                return;
+            }
+            premiumPriceElement.textContent = formatPrice(targetPrice);
+            resolve();
+        };
+        window.requestAnimationFrame(step);
+    });
+
     const animateFloatPriceMove = (fromX, fromY, toX, toY, fromPrice, toPrice, durationMs) => new Promise((resolve) => {
+        const premiumPriceElement = document.getElementById("premium-price-amount");
+        
         if (reducedMotionQuery.matches) {
             floatPrice.style.left = `${toX}px`;
             floatPrice.style.top = `${toY}px`;
             floatPrice.style.transform = "translate3d(-50%, -50%, 0) scale(1)";
             setPriceAmount(toPrice);
+            if (premiumPriceElement) {
+                premiumPriceElement.textContent = formatPrice(toPrice);
+            }
             resolve();
             return;
         }
@@ -1583,6 +1621,11 @@ document.addEventListener("DOMContentLoaded", () => {
             floatPrice.style.top = `${currentY.toFixed(2)}px`;
             floatPrice.style.transform = "translate3d(-50%, -50%, 0) scale(1)";
             setPriceAmount(currentPrice);
+            
+            // Also update the premium card's price during animation
+            if (premiumPriceElement) {
+                premiumPriceElement.textContent = formatPrice(currentPrice);
+            }
 
             if (progress < 1) {
                 window.requestAnimationFrame(step);
@@ -1593,6 +1636,9 @@ document.addEventListener("DOMContentLoaded", () => {
             floatPrice.style.top = `${toY}px`;
             floatPrice.style.transform = "translate3d(-50%, -50%, 0) scale(1)";
             setPriceAmount(toPrice);
+            if (premiumPriceElement) {
+                premiumPriceElement.textContent = formatPrice(toPrice);
+            }
             resolve();
         };
 
@@ -1628,6 +1674,26 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const runPricingSequence = async (options = {}) => {
+                        // Card 3D tilt on hover (for both cards)
+                        document.querySelectorAll('.pricing-card').forEach(card => {
+                            let tiltFrame;
+                            card.addEventListener('mousemove', e => {
+                                card.classList.add('is-tilted');
+                                if (tiltFrame) cancelAnimationFrame(tiltFrame);
+                                tiltFrame = requestAnimationFrame(() => {
+                                    const rect = card.getBoundingClientRect();
+                                    const x = e.clientX - rect.left;
+                                    const y = e.clientY - rect.top;
+                                    const rotateY = ((x / rect.width) - 0.5) * 18;
+                                    const rotateX = ((0.5 - (y / rect.height))) * 12;
+                                    card.style.transform = `scale(1.045) perspective(700px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+                                });
+                            });
+                            card.addEventListener('mouseleave', () => {
+                                card.classList.remove('is-tilted');
+                                card.style.transform = '';
+                            });
+                        });
         if (sequenceStarted || sequenceCompleted) return;
         const instantStart = Boolean(options.instantStart);
         sequenceStarted = true;
@@ -1644,38 +1710,35 @@ document.addEventListener("DOMContentLoaded", () => {
         await animateStoryLine(storyLine2);
         pricing.classList.add("pricing--layout-visible");
 
-        await animateElement(
-            floatPrice,
-            [
-                {
-                    opacity: 0,
-                    transform: "translate3d(-50%, calc(-50% + 28px), 0) scale(0.9)",
-                    filter: "blur(10px)"
-                },
-                {
-                    opacity: 1,
-                    transform: "translate3d(-50%, -50%, 0) scale(1)",
-                    filter: "blur(0px)"
-                }
-            ],
-            {
-                duration: 980,
-                easing: "cubic-bezier(0.16, 1, 0.3, 1)"
-            }
-        );
-
-        await sleep(220);
-
-        const pricingRect = pricing.getBoundingClientRect();
-        const finalPriceRect = priceSlot.getBoundingClientRect();
-        const startX = pricing.clientWidth / 2;
-        const startY = pricing.clientHeight / 2;
-        const targetX = (finalPriceRect.left - pricingRect.left) + (finalPriceRect.width / 2);
-        const targetY = (finalPriceRect.top - pricingRect.top) + (finalPriceRect.height / 2);
-
-        await animateFloatPriceMove(startX, startY, targetX, targetY, teaserPrice, targetPrice, 2200);
-        pinPriceToSlot();
-
+        // Show the pricing cards container, but hide free card and text
+        const pricingLayout = document.querySelector(".pricing-layout");
+        const cardsContainer = document.querySelector('.pricing-cards-container');
+        const pricingText = document.querySelector('.pricing-text');
+        const premiumCard = cardsContainer ? cardsContainer.querySelector('.pricing-card--premium') : null;
+        const freeCard = cardsContainer ? cardsContainer.querySelector('.pricing-card--free') : null;
+        const textLines = pricingText ? Array.from(pricingText.querySelectorAll('.pricing-reveal-line')) : [];
+        if (pricingLayout) {
+            pricingLayout.classList.add("pricing-cards-visible");
+        }
+        // Hide all cards and text lines initially
+        if (premiumCard) premiumCard.classList.remove('is-visible');
+        if (freeCard) freeCard.classList.remove('is-visible');
+        textLines.forEach(line => line.classList.remove('is-visible'));
+        // Animate premium card in
+        if (premiumCard) {
+            await sleep(120);
+            premiumCard.classList.add('is-visible');
+        }
+        // Animate free card in
+        if (freeCard) {
+            await sleep(220);
+            freeCard.classList.add('is-visible');
+        }
+        // Animate text lines in one by one
+        for (let i = 0; i < textLines.length; i++) {
+            await sleep(180);
+            textLines[i].classList.add('is-visible');
+        }
         await revealPricingLines();
         applyFinalState();
     };
@@ -1696,9 +1759,8 @@ document.addEventListener("DOMContentLoaded", () => {
         window.__notoNavJumpLockUntil = performance.now() + 1400;
 
         if (sequenceCompleted) {
-            pinPriceToSlot();
             window.scrollTo({
-                top: getElementCenterScrollY(floatPrice),
+                top: getPricingCenterScrollY(),
                 behavior: "auto"
             });
             return;

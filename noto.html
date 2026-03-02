@@ -105,11 +105,10 @@
       </p>
 
       <div class="pricing-layout" id="pricing-layout">
-        <div class="pricing-price-slot" id="pricing-price-slot" data-target-price="1.59"></div>
         <div class="pricing-text">
           <h2 class="pricing-reveal-line">Simple, transparent pricing.</h2>
-          <p class="pricing-reveal-line">No more guessing games. Just one straightforward plan giving you access to everything.</p>
-          <p class="pricing-reveal-line">All features included. Cancel anytime.</p>
+          <p class="pricing-reveal-line">Choose the plan that works best for you.</p>
+          <p class="pricing-reveal-line">Cancel anytime.</p>
           <p class="pricing-reveal-line waitlist-snippet">Join the waitlist to be notified when we launch.</p>
           <form class="waitlist-form pricing-reveal-line" id="waitlist-form" novalidate>
                 <label class="sr-only" for="waitlist-email">Email address</label>
@@ -138,6 +137,42 @@
                 </button>
             </form>
             <p class="waitlist-status" id="waitlist-status" role="status" aria-live="polite"></p>
+        </div>
+        <div class="pricing-cards-container">
+          <div class="pricing-card pricing-card--free">
+            <h3 class="pricing-card-title">Free</h3>
+            <div class="pricing-card-price">
+              <span class="pricing-card-price-amount">$0</span>
+              <span class="pricing-card-price-suffix">/month</span>
+            </div>
+            <ul class="pricing-card-features">
+              <li><svg stroke-linecap="round" stroke-linejoin="round" style="transform: translateY(3px);" fill="currentColor" width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.047,4,22,8.325,9.3,20,2,12.68,6.136,8.533,9.474,11.88Z"/></svg>
+                Basic note-taking</li>
+              <li><svg stroke-linecap="round" stroke-linejoin="round" style="transform: translateY(3px);" fill="currentColor" width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.047,4,22,8.325,9.3,20,2,12.68,6.136,8.533,9.474,11.88Z"/></svg>
+                Markdown support</li>
+            </ul>
+            <!-- button removed -->
+          </div>
+          
+          <div class="pricing-card pricing-card--premium" id="pricing-price-slot" data-target-price="1.59">
+            <!-- <div class="pricing-badge">Most Popular</div> -->
+            <h3 class="pricing-card-title">Premium</h3>
+            <div class="pricing-card-price">
+              <span class="pricing-card-price-amount" id="premium-price-amount">$1.59</span>
+              <span class="pricing-card-price-suffix">/month</span>
+            </div>
+            <ul class="pricing-card-features">
+              <li><svg stroke-linecap="round" stroke-linejoin="round" style="transform: translateY(3px);" fill="currentColor" width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.047,4,22,8.325,9.3,20,2,12.68,6.136,8.533,9.474,11.88Z"/></svg>
+                Basic note-taking</li>
+              <li><svg stroke-linecap="round" stroke-linejoin="round" style="transform: translateY(3px);" fill="currentColor" width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.047,4,22,8.325,9.3,20,2,12.68,6.136,8.533,9.474,11.88Z"/></svg>
+                Markdown support</li>
+              <li><svg stroke-linecap="round" stroke-linejoin="round" style="transform: translateY(3px);" fill="currentColor" width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.047,4,22,8.325,9.3,20,2,12.68,6.136,8.533,9.474,11.88Z"/></svg>
+                Cloud storage</li>
+              <li><svg stroke-linecap="round" stroke-linejoin="round" style="transform: translateY(3px);" fill="currentColor" width="16px" height="16px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.047,4,22,8.325,9.3,20,2,12.68,6.136,8.533,9.474,11.88Z"/></svg>
+                Collaboration tools</li>
+            </ul>
+            <!-- button removed -->
+          </div>
         </div>
       </div>
     </div>
