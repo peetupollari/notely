@@ -1,3 +1,64 @@
+/* ---- Footer Bottom ---- */
+.footer-bottom {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    background: #18181b;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 5vw;
+    padding: 3.5rem 0 3.5rem 0;
+    box-shadow: 0 -2px 24px 0 rgba(0,0,0,0.10);
+    border-top: 1.5px solid #23232a;
+}
+
+.footer-list-heading {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.1rem;
+    letter-spacing: 0.01em;
+}
+
+.footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.footer-list a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.footer-list a:hover,
+.footer-list a:focus-visible {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.footer-nav-list, .footer-socials-list {
+    min-width: 160px;
+}
+
+@media (max-width: 900px) {
+    .footer-bottom {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2.5rem;
+        padding: 2.5rem 0 0.5rem 0;
+    }
+    .footer-nav-list, .footer-socials-list {
+        min-width: 0;
+    }
+}
 @font-face {
   font-family: 'Lexend';
   src: url('fonts/Lexend-VariableFont.ttf') format('truetype-variations');
@@ -944,6 +1005,8 @@ b {
     font-size: clamp(1.85rem, 3.2vw, 2.8rem);
     line-height: 1.14;
     letter-spacing: -0.02em;
+    word-spacing: -0.07em;
+    font-size: 3.5rem;
 }
 
 .pricing-text p {
@@ -996,8 +1059,6 @@ b {
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
 }
 
-/* Remove special premium hover, unify hover for both cards */
-
 .pricing-badge {
     position: absolute;
     top: -12px;
@@ -1027,10 +1088,11 @@ b {
 }
 
 .pricing-card-price-amount {
-    font-size: 2.2rem;
-    font-weight: 700;
+    font-size: 7rem;
+    font-weight: 800;
     line-height: 1;
     letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
     font-variant-numeric: tabular-nums lining-nums;
 }
 
@@ -1148,6 +1210,10 @@ b {
     position: relative;
     margin-top: clamp(4.5rem, 14vh, 10rem);
     padding: 20vh 10vw;
+    padding-bottom: 0;
+    gap: 10rem;
+    display: flex;
+    flex-direction: column;
     border-top: var(--border);
     background:
         radial-gradient(120% 120% at 20% 0%, #ffffff 0%, #f6f6f6 55%, #f1f1f1 100%);
