@@ -2,14 +2,14 @@
 .footer-bottom {
     width: 100vw;
     margin-left: calc(50% - 50vw);
-    background: #18181b;
+    background: #181818;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 5vw;
     padding: 3.5rem 0 3.5rem 0;
     box-shadow: 0 -2px 24px 0 rgba(0,0,0,0.10);
-    border-top: 1.5px solid #23232a;
+    border-top: 1.5px solid #242424;
 }
 
 .footer-list-heading {
@@ -67,15 +67,15 @@
 }
 
 :root {
-    --text: #000000;
+    --text: #ffffff;
     --text-i: #ffffff;
-    --sub-text: #00000099;
+    --sub-text: #ffffff99;
     --pr: #000000;
     --t-pb: #00000010;
-    --t-sb: #ffffffb2;
+    --t-sb: #2424248c;
     --border-none: 1px solid transparent;
-    --border: 1px solid #0000000c;
-    --border-hover: 1px solid #00000048;
+    --border: 1px solid #7575750c;
+    --border-hover: 1px solid #5f5f5f48;
     --padding: 10px;
     --padding-m: 20px;
     --gap: 70px;
@@ -127,11 +127,12 @@ html {
 }
 
 mark {
-    background: rgb(209, 209, 209);
+    background: rgba(49, 49, 49, 0.61);
 }
 
 b {
     font-weight: 900;
+    color: var(--text-i);
 }
 
 .grid-bg {
@@ -139,10 +140,10 @@ b {
     isolation: isolate;
     min-height: 100vh;
     overflow-x: hidden;
-    background-color: #ffffff;
+    background-color: #0c0c0c;
     background-image:
-        linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     background-size: 40px 40px;
     background-position: center;
 }
@@ -219,7 +220,6 @@ b {
     height: 26px;
     width: 26px;
     padding: 13px 13px;
-    /* filter: invert(1); */
     background-color: var(--t-sb);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     border: var(--border);
@@ -237,13 +237,53 @@ b {
 /* --------------------------------- Hero --------------------------------- */
 .hero {
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     height: fit-content;
-    padding: 20vh 20vw;
-    padding-bottom: 25vh;
+    padding: 0 20vw;
+    padding-top: 25vh;
     gap: 10vh;
+    overflow: hidden;
+    isolation: isolate;
+    height: 75vh;
+}
+
+.hero-background {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.hero-background::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+}
+
+.hero-background-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 1;
+    filter: blur(1.5vw) contrast(1.05);
+    transform: scale(1.1);
+}
+
+.hero-background-grain {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.58;
+    mix-blend-mode: overlay;
+    filter: contrast(175%) brightness(102%);
 }
 
 .hero-title {
@@ -251,6 +291,9 @@ b {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    position: relative;
+    z-index: 1;
+    color: var(--text-i);
 }
 
 .hero-title h1{
@@ -260,12 +303,13 @@ b {
     word-spacing: 0.2rem;
     line-height: 5rem;
     margin: 1rem 0;
+    color: var(--text-i);
 }
 
 .hero-title p {
     font-size: 1rem;
     font-weight: 400;
-    color: var(--text);
+    color: var(--text-i);
     line-height: 1.5rem;
 }
 /* --------------------------------- Waitlist --------------------------------- */
@@ -281,7 +325,9 @@ b {
     flex: 1;
     min-width: 0;
     border: var(--border);
-    background: #ffffff;
+    background: var(--t-sb);
+    color: var(--text-i);
+    backdrop-filter: blur(5px);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
     border-radius: 999px;
     padding: 0.9rem 1rem;
@@ -291,14 +337,19 @@ b {
     outline: none;
 }
 
+.waitlist-form input::placeholder {
+    color: var(--text-i);
+    opacity: 0.6;
+}
+
 .waitlist-form input:hover {
     border: var(--border-hover);
-    background: #f3f3f3;
+    background: var(--t-sb);
 }
 
 .waitlist-form input:focus-visible {
     border: var(--border-hover);
-    background: #f3f3f3;
+    background: var(--t-sb);
 }
 
 .waitlist-form button {
@@ -395,7 +446,7 @@ b {
 /* --------------------------------- Hero --------------------------------- */
 /* --------------------------------- Features --------------------------------- */
 .basic-section {
-    background: linear-gradient(transparent, rgb(92, 92, 92)60%, black);
+    background: black;
     align-items: center;
     display: flex;
     position: relative;
@@ -505,13 +556,19 @@ b {
   );
 } */
 /* Blur End */
+
+.owerlay-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, #000000 30%, #00000000 100%);
+    z-index: 2;
+}
 .feature-showcase-media {
     border-radius: var(--media-radius);
     width: min(70vw, 1180px);
     margin-top: -15vh;
     display: block;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
-    z-index: -10;
 }
 .basic-text {
     margin-top: -8rem;
@@ -932,6 +989,7 @@ b {
 .be-first-shell.reveal-panel.is-visible > * {
     opacity: 1;
     transform: translateY(0);
+    color: var(--text);
 }
 
 .pricing-layout.reveal-panel.is-visible .pricing-text {
@@ -998,6 +1056,7 @@ b {
     grid-area: text;
     flex: 1 1 auto;
     max-width: 560px;
+    color: var(--text);
 }
 
 .pricing-text h2 {
@@ -1094,6 +1153,7 @@ b {
     letter-spacing: -0.02em;
     margin-bottom: 0.5rem;
     font-variant-numeric: tabular-nums lining-nums;
+    color: var(--text);
 }
 
 .pricing-card-price-suffix {
@@ -1215,8 +1275,7 @@ b {
     display: flex;
     flex-direction: column;
     border-top: var(--border);
-    background:
-        radial-gradient(120% 120% at 20% 0%, #ffffff 0%, #f6f6f6 55%, #f1f1f1 100%);
+    background: rgb(17, 17, 17);
 }
 
 .be-first-section + .contact-section {
@@ -1291,7 +1350,7 @@ b {
     border: var(--border);
     border-radius: calc(var(--radius) + 4px);
     padding: clamp(1.1rem, 2vw, 1.55rem);
-    background: #ffffffe1;
+    background: #1a1a1ae1;
     box-shadow: 0 20px 60px #00000012;
     backdrop-filter: blur(8px);
 }
@@ -1319,7 +1378,7 @@ b {
     width: 100%;
     border: var(--border);
     border-radius: 14px;
-    background: #ffffff;
+    background: #202020;
     padding: 0.8rem 0.95rem;
     font-family: inherit;
     font-size: 0.95rem;
@@ -1337,19 +1396,19 @@ b {
 
 .contact-field input::placeholder,
 .contact-field textarea::placeholder {
-    color: #00000073;
+    color: var(--sub-text);
 }
 
 .contact-field input:hover,
 .contact-field textarea:hover {
     border: var(--border-hover);
-    background: #f3f3f3;
+    background: #222222;
 }
 
 .contact-field input:focus-visible,
 .contact-field textarea:focus-visible {
     border: var(--border-hover);
-    background: #f3f3f3;
+    background: #222222;
 }
 
 /* .contact-submit {

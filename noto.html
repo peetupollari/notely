@@ -11,7 +11,7 @@
 
 <body class="grid-bg">
     <div class="titlebar">
-        <a href="#hero"><img src="images/notologo-black.png"></a>
+        <a href="#hero"><img class="titlebar-img" src="images/notologo.png"></a>
         <div class="titlebar-links">
             <a href="#features-stage">Features</a>
             <a href="#pricing">Pricing</a>
@@ -21,6 +21,33 @@
         <div class="titlebar-empty"></div>
     </div>
     <div class="hero" id="hero">
+        <div class="hero-background" aria-hidden="true">
+            <img class="hero-background-image" src="images/BlackWhiteBG.jpg" alt="">
+            <svg class="hero-background-grain" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+                <defs>
+                    <filter id="hero-grain-filter">
+                        <feTurbulence type="fractalNoise" baseFrequency="8" numOctaves="3" seed="7" stitchTiles="stitch" result="noise"></feTurbulence>
+                        <feColorMatrix
+                            in="noise"
+                            type="matrix"
+                            values="
+                                1.8 0 0 0 -0.1
+                                0 1.8 0 0 -0.4
+                                0 0 1.8 0 -0.4
+                                0 0 0 0.8 0"
+                            result="grain"
+                        ></feColorMatrix>
+                        <feComponentTransfer in="grain">
+                            <feFuncR type="gamma" amplitude="1.15" exponent="0.72" offset="0"></feFuncR>
+                            <feFuncG type="gamma" amplitude="1.15" exponent="0.72" offset="0"></feFuncG>
+                            <feFuncB type="gamma" amplitude="1.15" exponent="0.72" offset="0"></feFuncB>
+                            <feFuncA type="table" tableValues="0 0.52"></feFuncA>
+                        </feComponentTransfer>
+                    </filter>
+                </defs>
+                <rect width="100" height="100" filter="url(#hero-grain-filter)"></rect>
+            </svg>
+        </div>
         <div class="hero-title">
             <h1>The only <mark><b>**Markdown**</b></mark> app <br> you'll ever need.</h1>
             <p>A streamlined <b>**Markdown**</b> note app that gives you <u><i>*structure and flexibility*</i></u> <br> without the plugins, clutter, or learning curve.</p>
@@ -57,7 +84,8 @@
     <section class="features-stage" id="features-stage">
       <div class="features">
         <div class="basic-section">
-          <img class="feature-showcase-media" src="images/basicimage-noto.png" alt="Noto editor and markdown workspace preview.">
+          <div class="owerlay-gradient"></div>
+          <img class="feature-showcase-media" src="images/basicimage-noto-dark.png" alt="Noto editor and markdown workspace preview.">
           <div class="gradient-blur">
             <div></div>
             <div></div>
@@ -81,7 +109,7 @@
             <div class="storage-carousel-viewport">
               <div class="storage-carousel-track">
                 <article class="storage-slide is-active" data-storage-slide data-slide-label="List view">
-                  <img class="feature-showcase-media" src="images/storageiconview-noto (2).png" alt="Noto storage screen shown in list view.">
+                  <img class="feature-showcase-media" src="images/storagelistview-d.png" alt="Noto storage screen shown in list view.">
                   <div class="storage-slide-overlay feature-copy feature-copy--hover" data-reveal-on="hover">
                     <p class="storage-slide-eyebrow">
                       <span class="line-reveal"><span>Local-first storage</span></span>
@@ -97,7 +125,7 @@
                   </div>
                 </article>
                 <article class="storage-slide" data-storage-slide data-slide-label="Icon view">
-                  <img class="feature-showcase-media" src="images/storageiconview-noto (1).png" alt="Noto storage screen shown in icon view.">
+                  <img class="feature-showcase-media" src="images/storageiconview-d.png" alt="Noto storage screen shown in icon view.">
                   <div class="storage-slide-overlay feature-copy feature-copy--hover" data-reveal-on="hover">
                     <p class="storage-slide-eyebrow">
                       <span class="line-reveal"><span>Flexible organization</span></span>
@@ -112,7 +140,7 @@
                   </div>
                 </article>
                 <article class="storage-slide" data-storage-slide data-slide-label="Preview view">
-                  <img class="feature-showcase-media" src="images/storagelistview-noto.png" alt="Noto storage screen shown with larger file previews.">
+                  <img class="feature-showcase-media" src="images/storageimageview-d.png" alt="Noto storage screen shown with larger file previews.">
                   <div class="storage-slide-overlay feature-copy feature-copy--hover" data-reveal-on="hover">
                     <p class="storage-slide-eyebrow">
                       <span class="line-reveal"><span>Readable at a glance</span></span>
@@ -233,7 +261,7 @@
             <p class="waitlist-status" id="waitlist-status" role="status" aria-live="polite"></p>
         </div>
         <div class="pricing-cards-container" style="display: flex; justify-content: flex-end; align-items: center; background: none; box-shadow: none;">
-          <span class="pricing-card-price-amount">$39.99</span>
+          <span class="pricing-card-price-amount">$59.99</span>
         </div>
       </div>
     </div>
