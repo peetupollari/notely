@@ -12,11 +12,16 @@
 <body class="grid-bg">
     <div class="titlebar">
         <a href="#hero"><img class="titlebar-img" src="images/notologo.png"></a>
-        <div class="titlebar-links">
-            <a href="#features-stage">Features</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#footer">Contact</a>
-            <div class="titlebar-indicator"></div>
+        <button class="hamburger" id="hamburger" aria-label="Open navigation" aria-controls="main-nav" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="titlebar-links" id="main-nav">
+          <a href="#features-stage">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#footer">Contact</a>
+          <div class="titlebar-indicator"></div>
         </div>
         <div class="titlebar-empty"></div>
     </div>
@@ -375,102 +380,120 @@
       
     </footer>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const nav = document.querySelector('.titlebar-links');
-            const links = Array.from(nav?.querySelectorAll('a') ?? []);
-            const indicator = nav?.querySelector('.titlebar-indicator');
-            const sectionLinks = links
-                .map((link) => {
-                    const href = link.getAttribute('href') ?? '';
-                    if (!href.startsWith('#') || href.length < 2) return null;
-                    const target = document.querySelector(href);
-                    if (!target) return null;
-                    return { link, target };
-                })
-                .filter(Boolean);
+      document.addEventListener('DOMContentLoaded', () => {
+        const nav = document.querySelector('.titlebar-links');
+        const links = Array.from(nav?.querySelectorAll('a') ?? []);
+        const indicator = nav?.querySelector('.titlebar-indicator');
+        const hamburger = document.getElementById('hamburger');
+        const sectionLinks = links
+          .map((link) => {
+            const href = link.getAttribute('href') ?? '';
+            if (!href.startsWith('#') || href.length < 2) return null;
+            const target = document.querySelector(href);
+            if (!target) return null;
+            return { link, target };
+          })
+          .filter(Boolean);
 
-            if (!nav || !links.length || !indicator) return;
+        if (!nav || !links.length || !indicator) return;
 
-            let active = links[0];
-            let scrollSyncQueued = false;
-            active.classList.add('active');
+        let active = links[0];
+        let scrollSyncQueued = false;
+        active.classList.add('active');
 
-            const setActive = (link) => {
-                if (!link || link === active) return;
-                active.classList.remove('active');
-                active = link;
-                active.classList.add('active');
-            };
-
-            const moveTo = (link) => {
-                const linkRect = link.getBoundingClientRect();
-                const navRect = nav.getBoundingClientRect();
-                indicator.style.width = `${linkRect.width}px`;
-                indicator.style.transform = `translateX(${linkRect.left - navRect.left}px)`;
-                indicator.style.opacity = 1;
-            };
-
-            const syncActiveFromScroll = () => {
-                if (!sectionLinks.length) {
-                    moveTo(active);
-                    return;
-                }
-
-                const probeY = window.scrollY + (window.innerHeight * 0.38);
-                let currentLink = sectionLinks[0].link;
-
-                sectionLinks.forEach(({ link, target }) => {
-                    const sectionTop = window.scrollY + target.getBoundingClientRect().top;
-                    if (sectionTop <= probeY) currentLink = link;
-                });
-
-                setActive(currentLink);
-                moveTo(active);
-            };
-
-            const requestScrollSync = () => {
-                if (scrollSyncQueued) return;
-                scrollSyncQueued = true;
-                window.requestAnimationFrame(() => {
-                    scrollSyncQueued = false;
-                    syncActiveFromScroll();
-                });
-            };
-
-            links.forEach((link) => {
-                link.addEventListener('click', (event) => {
-                    setActive(link);
-                    moveTo(link);
-
-                    const href = link.getAttribute('href') ?? '';
-                    if (!href.startsWith('#') || href.length < 2) return;
-                    if (href === '#pricing') return;
-
-                    const target = document.querySelector(href);
-                    if (!target) return;
-
-                    event.preventDefault();
-                    window.__notoNavJumpLockUntil = performance.now() + 1200;
-                    const targetY = window.scrollY + target.getBoundingClientRect().top;
-                    window.scrollTo({
-                        top: targetY,
-                        behavior: 'auto'
-                    });
-                    requestScrollSync();
-                });
+        // Hamburger menu toggle
+        if (hamburger) {
+          hamburger.addEventListener('click', () => {
+            const expanded = nav.classList.toggle('open');
+            hamburger.setAttribute('aria-expanded', nav.classList.contains('open'));
+          });
+          // Close menu on link click (mobile)
+          links.forEach(link => {
+            link.addEventListener('click', () => {
+              if (window.innerWidth <= 900) {
+                nav.classList.remove('open');
+                hamburger.setAttribute('aria-expanded', 'false');
+              }
             });
+          });
+        }
 
-            nav.addEventListener('mouseleave', () => moveTo(active));
-            nav.addEventListener('focusout', (event) => {
-                if (!nav.contains(event.relatedTarget)) {
-                    moveTo(active);
-                }
+        const setActive = (link) => {
+          if (!link || link === active) return;
+          active.classList.remove('active');
+          active = link;
+          active.classList.add('active');
+        };
+
+        const moveTo = (link) => {
+          const linkRect = link.getBoundingClientRect();
+          const navRect = nav.getBoundingClientRect();
+          indicator.style.width = `${linkRect.width}px`;
+          indicator.style.transform = `translateX(${linkRect.left - navRect.left}px)`;
+          indicator.style.opacity = 1;
+        };
+
+        const syncActiveFromScroll = () => {
+          if (!sectionLinks.length) {
+            moveTo(active);
+            return;
+          }
+
+          const probeY = window.scrollY + (window.innerHeight * 0.38);
+          let currentLink = sectionLinks[0].link;
+
+          sectionLinks.forEach(({ link, target }) => {
+            const sectionTop = window.scrollY + target.getBoundingClientRect().top;
+            if (sectionTop <= probeY) currentLink = link;
+          });
+
+          setActive(currentLink);
+          moveTo(active);
+        };
+
+        const requestScrollSync = () => {
+          if (scrollSyncQueued) return;
+          scrollSyncQueued = true;
+          window.requestAnimationFrame(() => {
+            scrollSyncQueued = false;
+            syncActiveFromScroll();
+          });
+        };
+
+        links.forEach((link) => {
+          link.addEventListener('click', (event) => {
+            setActive(link);
+            moveTo(link);
+
+            const href = link.getAttribute('href') ?? '';
+            if (!href.startsWith('#') || href.length < 2) return;
+            if (href === '#pricing') return;
+
+            const target = document.querySelector(href);
+            if (!target) return;
+
+            event.preventDefault();
+            window.__notoNavJumpLockUntil = performance.now() + 1200;
+            const targetY = window.scrollY + target.getBoundingClientRect().top;
+            window.scrollTo({
+              top: targetY,
+              behavior: 'auto'
             });
-            window.addEventListener('scroll', requestScrollSync, { passive: true });
-            window.addEventListener('resize', requestScrollSync);
-
             requestScrollSync();
+          });
         });
+
+        nav.addEventListener('mouseleave', () => moveTo(active));
+        nav.addEventListener('focusout', (event) => {
+          if (!nav.contains(event.relatedTarget)) {
+            moveTo(active);
+          }
+        });
+        window.addEventListener('scroll', requestScrollSync, { passive: true });
+        window.addEventListener('resize', requestScrollSync);
+
+        requestScrollSync();
+      });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

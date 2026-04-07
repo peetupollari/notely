@@ -1,3 +1,164 @@
+/* Hamburger menu for mobile */
+/* Hamburger menu styled like hero bg, right-aligned */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(12,12,12,0.82);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.18);
+    border: 1.5px solid #242424;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 200;
+    margin-left: auto;
+    margin-right: 0.5rem;
+    backdrop-filter: blur(8px) contrast(1.05);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.hamburger span {
+    display: block;
+    width: 22px;
+    height: 3px;
+    margin: 3px 0;
+    background: #fff;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+@media (max-width: 900px) {
+    .hamburger {
+        display: flex;
+        position: absolute;
+        right: 0.5rem;
+        top: 0.7rem;
+        margin: 0;
+    }
+    .titlebar {
+        top: 0;
+        padding: 0 0.2rem;
+        height: 56px;
+        min-height: 56px;
+        background: transparent;
+        align-items: flex-start;
+    }
+    .titlebar > a {
+        margin-left: 0.5rem;
+        margin-top: 0.2rem;
+    }
+    .titlebar-links {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        background: rgba(12,12,12,0.97);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        width: 100vw;
+        min-width: 0;
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: height 0.3s, opacity 0.3s;
+        z-index: 150;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        backdrop-filter: blur(8px) contrast(1.05);
+    }
+    .titlebar-links.open {
+        height: 148px;
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .titlebar-links a {
+        padding: 1.1rem 0;
+        font-size: 1.1rem;
+        border-bottom: 1px solid #2222;
+    }
+    .titlebar-indicator {
+        display: none;
+    }
+    /* Hero text improvements */
+    .hero {
+        padding: 4.2rem 0.7rem 2.2rem;
+        gap: 1.1rem;
+        min-height: 60vh;
+        height: auto;
+    }
+    .hero-title h1 {
+        font-size: 2.1rem;
+        line-height: 1.18;
+        margin: 0.7rem 0 0.5rem 0;
+        word-break: break-word;
+    }
+    .hero-title p {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+    }
+    /* Pricing section improvements */
+    .pricing {
+        min-height: unset;
+        padding: 2.2rem 0.5rem 1.5rem;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .pricing-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        width: 100%;
+        padding: 0;
+    }
+    .pricing-text {
+        max-width: 100%;
+        text-align: center;
+        padding: 0 0.2rem;
+    }
+    .pricing-text h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.7rem;
+    }
+    .pricing-cards-container {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 1.2rem !important;
+        width: 100%;
+        justify-content: center;
+    }
+    .pricing-card-price-amount {
+        font-size: 2.2rem;
+    }
+    /* Footer improvements */
+    .footer-bottom {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.2rem;
+        padding: 1.2rem 0 0.5rem 0;
+        font-size: 0.95rem;
+        background: #161616;
+        box-shadow: 0 -2px 16px 0 rgba(0,0,0,0.13);
+    }
+    .footer-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.2rem;
+        justify-content: flex-start;
+    }
+    .footer-list-heading {
+        margin-bottom: 0.5rem;
+        font-size: 0.98rem;
+    }
+    .footer-nav-list, .footer-socials-list {
+        min-width: 0;
+        margin-bottom: 0.7rem;
+    }
+}
 /* ---- Footer Bottom ---- */
 .footer-bottom {
     width: 100vw;
