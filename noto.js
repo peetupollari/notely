@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     const forms = Array.from(document.querySelectorAll(".waitlist-form"));
     if (!forms.length) return;
+    const waitlistCountElement = document.querySelector("[data-waitlist-count]");
+    const waitlistCountText = waitlistCountElement?.querySelector("[data-waitlist-count-text]") ?? null;
 
     const SUPABASE_URL = "https://hrsjiejhvrlfjuzbxzgv.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyc2ppZWpodnJsZmp1emJ4emd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NzM0MDksImV4cCI6MjA4NzM0OTQwOX0.5G1nKpGhtUnF9fQr2bOIKgJMG8BDX8OFsiIMKYTEORY";
@@ -12,6 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
         statusElement.classList.toggle("visible", Boolean(message));
         if (message) statusElement.classList.add(tone);
     };
+
+    const setWaitlistCount = (message) => {
+        if (!(waitlistCountText instanceof HTMLElement)) return;
+        waitlistCountText.textContent = message;
+    };
+
+    const formatWaitlistCount = (count) => {
+        const countLabel = count.toLocaleString();
+        return count === 1
+            ? `${countLabel} person already on the waitlist`
+            : `${countLabel} people already on the waitlist`;
+    };
+
+    let waitlistCountRequest = null;
 
     const activeConfettiParticles = [];
     let confettiFrameId = 0;
@@ -131,11 +147,62 @@ document.addEventListener("DOMContentLoaded", () => {
         contexts.forEach((context) => {
             setStatus(context.status, "Waitlist is not configured yet.", "error");
         });
+        setWaitlistCount("Waitlist count unavailable right now.");
         return;
     }
 
     const { createClient } = window.supabase;
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const WAITLIST_COUNT_REFRESH_MS = 15000;
+
+    const refreshWaitlistCount = ({ showLoading = false } = {}) => {
+        if (!(waitlistCountText instanceof HTMLElement)) return Promise.resolve(null);
+        if (waitlistCountRequest) return waitlistCountRequest;
+        if (showLoading) setWaitlistCount("Loading waitlist count...");
+
+        waitlistCountRequest = (async () => {
+            try {
+                const { data, error } = await supabase.rpc("get_waitlist_count");
+
+                if (error) throw error;
+                const count = Number(data);
+
+                if (!Number.isFinite(count) || count < 0) {
+                    throw new Error("Waitlist count was not returned.");
+                }
+
+                setWaitlistCount(formatWaitlistCount(count));
+                return count;
+            } catch (error) {
+                setWaitlistCount("Waitlist count unavailable right now.");
+                console.error("Waitlist count fetch failed:", error);
+                return null;
+            } finally {
+                waitlistCountRequest = null;
+            }
+        })();
+
+        return waitlistCountRequest;
+    };
+
+    void refreshWaitlistCount({ showLoading: true });
+
+    if (waitlistCountElement instanceof HTMLElement) {
+        const waitlistCountIntervalId = window.setInterval(() => {
+            if (document.hidden) return;
+            void refreshWaitlistCount();
+        }, WAITLIST_COUNT_REFRESH_MS);
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) return;
+            void refreshWaitlistCount();
+        });
+
+        window.addEventListener("beforeunload", () => {
+            window.clearInterval(waitlistCountIntervalId);
+        }, { once: true });
+    }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -171,6 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 context.form.reset();
                 didJoinWaitlist = true;
                 setStatus(context.status, "Thanks for joining the waitlist! We'll be in touch when the app is ready.", "info");
+                void refreshWaitlistCount();
             } catch (err) {
                 setStatus(context.status, "Could not join waitlist. Check your connection and try again.", "error");
                 console.error("Waitlist request failed:", err);

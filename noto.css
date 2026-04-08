@@ -578,6 +578,47 @@ b {
     color: #000000;
 }
 
+.hero .waitlist-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    margin: 0.85rem 0 0;
+    min-height: 1.1rem;
+    color: var(--text-i);
+    font-size: 0.92rem;
+    letter-spacing: 0.01em;
+    opacity: 0.9;
+}
+
+.hero .waitlist-count-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0.45);
+    animation: waitlist-count-dot-pulse 1.8s ease-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes waitlist-count-dot-pulse {
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.52);
+        opacity: 0.78;
+    }
+    65% {
+        transform: scale(1.15);
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        opacity: 0.78;
+    }
+}
+
 .sr-only {
     position: absolute;
     width: 1px;
@@ -1957,6 +1998,12 @@ b {
 
     .waitlist-status {
         text-align: center;
+    }
+
+    .hero .waitlist-count {
+        font-size: 0.85rem;
+        padding: 0 0.75rem;
+        text-wrap: balance;
     }
 
     .feature-showcase-media {
