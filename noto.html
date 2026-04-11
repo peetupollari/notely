@@ -31,16 +31,9 @@
             <svg class="hero-background-grain" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
                 <defs>
                     <filter id="hero-grain-filter">
-                        <feTurbulence type="fractalNoise" baseFrequency="8" numOctaves="3" seed="7" stitchTiles="stitch" result="noise"></feTurbulence>
+                        <feTurbulence type="fractalNoise" baseFrequency="6" numOctaves="10" seed="7" result="turbulance"></feTurbulence>
                         <feColorMatrix
-                            in="noise"
-                            type="matrix"
-                            values="
-                                1.8 0 0 0 -0.1
-                                0 1.8 0 0 -0.4
-                                0 0 1.8 0 -0.4
-                                0 0 0 0.8 0"
-                            result="grain"
+                            in="composite" type="luminanceToAlpha"
                         ></feColorMatrix>
                         <feComponentTransfer in="grain">
                             <feFuncR type="gamma" amplitude="1.15" exponent="0.72" offset="0"></feFuncR>
@@ -91,6 +84,7 @@
     </div>
     
     <section class="features-stage" id="features-stage">
+      <div class="features-top-gradient"></div>
       <div class="features">
         <div class="basic-section">
           <div class="owerlay-gradient"></div>
