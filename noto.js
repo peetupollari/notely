@@ -264,14 +264,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    const revealGroup = (group) => {
+        group.classList.add("is-visible");
+
+        const featureStory = group.closest(".feature-story");
+        if (featureStory instanceof HTMLElement) {
+            featureStory.classList.add("is-visible");
+        }
+    };
+
     const scrollRevealGroups = revealGroups.filter((group) => group.dataset.revealOn === "scroll");
     if (prefersReducedMotion || typeof IntersectionObserver !== "function") {
-        scrollRevealGroups.forEach((group) => group.classList.add("is-visible"));
+        scrollRevealGroups.forEach(revealGroup);
     } else {
         const revealObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach((entry) => {
                 if (!entry.isIntersecting) return;
-                entry.target.classList.add("is-visible");
+                revealGroup(entry.target);
                 observer.unobserve(entry.target);
             });
         }, {
@@ -282,30 +291,27 @@ document.addEventListener("DOMContentLoaded", () => {
         scrollRevealGroups.forEach((group) => revealObserver.observe(group));
     }
 
-    const carousel = document.querySelector("[data-storage-carousel]");
-    if (!(carousel instanceof HTMLElement)) return;
+    const storageSwitcher = document.querySelector("[data-storage-switcher]");
+    const storagePanels = Array.from(storageSwitcher?.querySelectorAll("[data-storage-panel]") ?? []);
+    const storageDots = Array.from(document.querySelectorAll("[data-storage-dot]"));
 
-    const track = carousel.querySelector(".storage-carousel-track");
-    const slides = Array.from(carousel.querySelectorAll("[data-storage-slide]"));
-    const dots = Array.from(carousel.querySelectorAll("[data-storage-dot]"));
-    if (!(track instanceof HTMLElement) || !slides.length || slides.length !== dots.length) return;
+    let activeStorageIndex = Math.max(0, storagePanels.findIndex((panel) => panel.classList.contains("is-active")));
 
-    let activeIndex = Math.max(0, slides.findIndex((slide) => slide.classList.contains("is-active")));
-    let autoplayId = 0;
+    const setActiveStoragePanel = (nextIndex) => {
+        if (!storagePanels.length || storagePanels.length !== storageDots.length) return;
 
-    const setActiveSlide = (nextIndex) => {
-        activeIndex = (nextIndex + slides.length) % slides.length;
-        track.style.transform = `translateX(-${activeIndex * 100}%)`;
+        activeStorageIndex = (nextIndex + storagePanels.length) % storagePanels.length;
 
-        slides.forEach((slide, slideIndex) => {
-            const isActive = slideIndex === activeIndex;
-            slide.classList.toggle("is-active", isActive);
-            slide.setAttribute("aria-hidden", String(!isActive));
+        storagePanels.forEach((panel, panelIndex) => {
+            const isActive = panelIndex === activeStorageIndex;
+            panel.classList.toggle("is-active", isActive);
+            panel.setAttribute("aria-hidden", String(!isActive));
         });
 
-        dots.forEach((dot, dotIndex) => {
-            const isActive = dotIndex === activeIndex;
+        storageDots.forEach((dot, dotIndex) => {
+            const isActive = dotIndex === activeStorageIndex;
             dot.classList.toggle("is-active", isActive);
+
             if (isActive) {
                 dot.setAttribute("aria-current", "true");
             } else {
@@ -314,53 +320,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    const stopAutoplay = () => {
-        if (!autoplayId) return;
-        window.clearInterval(autoplayId);
-        autoplayId = 0;
-    };
-
-    const startAutoplay = () => {
-        if (prefersReducedMotion || slides.length < 2) return;
-        stopAutoplay();
-        autoplayId = window.setInterval(() => {
-            setActiveSlide(activeIndex + 1);
-        }, 8000);
-    };
-
-    const maybeResumeAutoplay = () => {
-        if (prefersReducedMotion) return;
-        if (carousel.matches(":hover")) return;
-        startAutoplay();
-    };
-
-    dots.forEach((dot, dotIndex) => {
-        dot.addEventListener("click", () => {
-            setActiveSlide(dotIndex);
-            stopAutoplay();
-            maybeResumeAutoplay();
+    if (storagePanels.length && storagePanels.length === storageDots.length) {
+        storageDots.forEach((dot, dotIndex) => {
+            dot.addEventListener("click", () => {
+                setActiveStoragePanel(dotIndex);
+            });
         });
-    });
 
-    carousel.addEventListener("mouseenter", stopAutoplay);
-    carousel.addEventListener("mouseleave", maybeResumeAutoplay);
-
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-            stopAutoplay();
-            return;
-        }
-        maybeResumeAutoplay();
-    });
+        setActiveStoragePanel(activeStorageIndex);
+    }
 
     const syncMotionPreference = (event) => {
         prefersReducedMotion = event.matches;
         if (prefersReducedMotion) {
-            scrollRevealGroups.forEach((group) => group.classList.add("is-visible"));
-            stopAutoplay();
-            return;
+            scrollRevealGroups.forEach(revealGroup);
         }
-        maybeResumeAutoplay();
     };
 
     if (typeof motionQuery.addEventListener === "function") {
@@ -368,9 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (typeof motionQuery.addListener === "function") {
         motionQuery.addListener(syncMotionPreference);
     }
-
-    setActiveSlide(activeIndex);
-    maybeResumeAutoplay();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
