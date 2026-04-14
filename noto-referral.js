@@ -8,6 +8,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const FIREBASE_COLLECTION = window.NOTO_FIREBASE_COLLECTION || "waitlist_referrals";
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    if (shouldForceCanonicalCallbackRedirect()) {
+        window.location.replace(buildCanonicalCallbackUrl(CANONICAL_REFERRAL_URL));
+        return;
+    }
+
     const elements = {
         authForm: document.getElementById("referral-auth-form"),
         authInput: document.getElementById("referral-auth-email"),
@@ -465,6 +470,27 @@ function getMagicLinkRedirectUrl(baseUrl = "") {
     const redirectUrl = resolveCanonicalUrl(baseUrl);
     redirectUrl.search = "";
     redirectUrl.hash = "";
+    return redirectUrl.toString();
+}
+
+function shouldForceCanonicalCallbackRedirect() {
+    const host = String(window.location.hostname || "").toLowerCase();
+    if (host !== "localhost" && host !== "127.0.0.1") return false;
+
+    const callbackPayload = `${window.location.search}${window.location.hash}`.toLowerCase();
+    return (
+        callbackPayload.includes("access_token=") ||
+        callbackPayload.includes("refresh_token=") ||
+        callbackPayload.includes("token_hash=") ||
+        callbackPayload.includes("type=") ||
+        callbackPayload.includes("error_code=")
+    );
+}
+
+function buildCanonicalCallbackUrl(baseUrl = "") {
+    const redirectUrl = resolveCanonicalUrl(baseUrl);
+    redirectUrl.search = window.location.search;
+    redirectUrl.hash = window.location.hash;
     return redirectUrl.toString();
 }
 
