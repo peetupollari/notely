@@ -2721,3 +2721,341 @@ footer {
     position: relative;
 }
 
+/* --------------------------------- Referral --------------------------------- */
+.referral-page {
+    color: var(--text);
+    height: 100dvh;
+    overflow: hidden;
+}
+
+.referral-hero {
+    min-height: 100dvh;
+    height: 100dvh;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    padding: 1.2rem 1.5rem;
+    overflow: hidden;
+}
+
+.referral-topbar {
+    width: min(760px, 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    z-index: 1;
+}
+
+.referral-page-title {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+}
+
+.referral-home-link {
+    color: var(--sub-text);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: color 160ms ease;
+}
+
+.referral-home-link:hover,
+.referral-home-link:focus-visible {
+    color: var(--text);
+}
+
+.referral-shell {
+    width: min(760px, 100%);
+    display: grid;
+    align-items: stretch;
+    min-height: 0;
+    height: 100%;
+}
+
+.referral-shell[hidden] {
+    display: none !important;
+}
+
+.referral-loader-screen {
+    width: 100%;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+}
+
+.referral-loader-screen[hidden] {
+    display: none !important;
+}
+
+.referral-loader-screen-content {
+    display: grid;
+    place-items: center;
+    gap: 1rem;
+    text-align: center;
+    width: min(360px, 100%);
+}
+
+.referral-panel {
+    display: grid;
+    gap: 1.25rem;
+    width: 100%;
+    align-content: center;
+    justify-items: center;
+    text-align: center;
+}
+
+.referral-panel[hidden] {
+    display: none !important;
+}
+
+.referral-panel-copy {
+    display: grid;
+    gap: 0.45rem;
+    width: min(560px, 100%);
+    justify-items: start;
+    text-align: left;
+}
+
+.referral-panel-copy h2 {
+    margin: 0;
+    font-size: clamp(1.55rem, 4vw, 2.35rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    color: var(--text);
+}
+
+.referral-panel-copy p {
+    margin: 0;
+    color: var(--sub-text);
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.referral-form {
+    margin-top: 0.2rem;
+    width: min(560px, 100%);
+}
+
+.referral-status {
+    min-height: 1.5rem;
+    color: var(--sub-text);
+    width: min(560px, 100%);
+    text-align: center;
+}
+
+.referral-status.info,
+.referral-status.success,
+.referral-status.error {
+    color: var(--sub-text);
+}
+
+.referral-panel--owner {
+    height: 100%;
+    grid-template-rows: 1fr auto;
+    align-content: stretch;
+    justify-items: center;
+    text-align: left;
+}
+
+.referral-owner-content {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    min-height: 0;
+    width: 100%;
+}
+
+.referral-owner-email {
+    margin: 0;
+    color: var(--sub-text);
+    font-size: 0.98rem;
+    word-break: break-word;
+}
+
+.referral-secondary-button {
+    border: var(--border);
+    border-radius: 999px;
+    padding: 0.72rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease, transform 120ms ease;
+}
+
+.referral-secondary-button:hover,
+.referral-secondary-button:focus-visible {
+    background: rgba(255, 255, 255, 0.07);
+    border: var(--border-hover);
+}
+
+.referral-secondary-button:active {
+    transform: scale(0.97);
+}
+
+.referral-loader {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.14);
+    border-top-color: rgba(255, 255, 255, 0.92);
+    animation: referral-spin 0.9s linear infinite;
+}
+
+.referral-loader-title {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1.45rem, 4vw, 2rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+}
+
+.referral-loader-copy {
+    margin: 0;
+    color: var(--sub-text);
+    font-size: 0.96rem;
+    line-height: 1.6;
+}
+
+@keyframes referral-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.referral-result {
+    display: grid;
+    gap: 0.95rem;
+    width: min(640px, 100%);
+    justify-items: stretch;
+    text-align: left;
+}
+
+.referral-label {
+    margin: 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sub-text);
+    font-weight: 700;
+}
+
+.referral-help-copy {
+    margin: 0;
+    color: var(--sub-text);
+    line-height: 1.65;
+    max-width: 46rem;
+}
+
+.referral-link-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.referral-link-input {
+    flex: 1;
+    min-width: 0;
+    border: var(--border);
+    border-radius: 18px;
+    background: #202020;
+    padding: 0.95rem 1rem;
+    font-family: inherit;
+    font-size: 0.94rem;
+    color: var(--text);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.referral-link-input:hover,
+.referral-link-input:focus-visible {
+    border: var(--border-hover);
+    background: #242424;
+}
+
+.referral-primary-button {
+    align-self: stretch;
+    justify-self: stretch;
+    justify-content: center;
+}
+
+.referral-primary-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.referral-count-line {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    font-weight: 550;
+}
+
+.referral-owner-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.25rem;
+    color: var(--sub-text);
+    width: min(640px, 100%);
+    justify-self: center;
+}
+
+@media (max-width: 900px) {
+    .referral-hero {
+        padding: 1rem 1.2rem;
+    }
+
+    .referral-link-row {
+        flex-direction: column;
+    }
+
+    .referral-owner-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .referral-primary-button,
+    .referral-secondary-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .referral-hero {
+        padding: 0.9rem;
+    }
+
+    .referral-owner-email {
+        font-size: 0.88rem;
+    }
+
+    .referral-panel-copy h2 {
+        font-size: clamp(1.45rem, 8vw, 1.95rem);
+    }
+
+    .referral-panel-copy p {
+        font-size: 0.95rem;
+        line-height: 1.58;
+    }
+
+    .referral-loader-title {
+        font-size: clamp(1.35rem, 8vw, 1.8rem);
+    }
+}
+/* --------------------------------- Referral --------------------------------- */
+
