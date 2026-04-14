@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const SUPABASE_URL = "https://hrsjiejhvrlfjuzbxzgv.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyc2ppZWpodnJsZmp1emJ4emd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NzM0MDksImV4cCI6MjA4NzM0OTQwOX0.5G1nKpGhtUnF9fQr2bOIKgJMG8BDX8OFsiIMKYTEORY";
+    const CANONICAL_REFERRAL_URL = "https://www.notely.uk/noto-referral.html";
     const FIREBASE_CONFIG = window.NOTO_FIREBASE_CONFIG ?? null;
     const FIREBASE_COLLECTION = window.NOTO_FIREBASE_COLLECTION || "waitlist_referrals";
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -156,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const requestOptions = {
             shouldCreateUser: true
         };
-        const redirectUrl = getMagicLinkRedirectUrl();
+        const redirectUrl = getMagicLinkRedirectUrl(CANONICAL_REFERRAL_URL);
 
         if (redirectUrl) {
             requestOptions.emailRedirectTo = redirectUrl;
@@ -359,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function renderOwnerReferral(profile, fallbackEmail = "") {
         showOnlyPanel(elements.ownerPanel);
         elements.ownerEmail.textContent = profile.email || fallbackEmail;
-        elements.linkInput.value = buildReferralLink(profile.referral_code);
+        elements.linkInput.value = buildReferralLink(profile.referral_code, CANONICAL_REFERRAL_URL);
         setReferralCount(profile.referral_count);
         elements.copyButton.disabled = false;
         setStatus(elements.ownerStatus, "");
@@ -447,8 +448,8 @@ function delay(milliseconds) {
     });
 }
 
-function buildReferralLink(referralCode) {
-    const cleanUrl = new URL(window.location.href);
+function buildReferralLink(referralCode, baseUrl = "") {
+    const cleanUrl = resolveCanonicalUrl(baseUrl);
     cleanUrl.search = "";
     cleanUrl.hash = "";
     return `${cleanUrl.toString()}?ref=${referralCode}`;
@@ -460,16 +461,28 @@ function formatReferralCount(count) {
     return safeCount === 1 ? `${label} referral` : `${label} referrals`;
 }
 
-function getMagicLinkRedirectUrl() {
-    const protocol = window.location.protocol;
-    if (protocol !== "http:" && protocol !== "https:") {
-        return "";
-    }
-
-    const redirectUrl = new URL(window.location.href);
+function getMagicLinkRedirectUrl(baseUrl = "") {
+    const redirectUrl = resolveCanonicalUrl(baseUrl);
     redirectUrl.search = "";
     redirectUrl.hash = "";
     return redirectUrl.toString();
+}
+
+function resolveCanonicalUrl(baseUrl = "") {
+    if (baseUrl) {
+        try {
+            return new URL(baseUrl);
+        } catch (error) {
+            console.error("Invalid canonical URL:", error);
+        }
+    }
+
+    const protocol = window.location.protocol;
+    if (protocol === "http:" || protocol === "https:") {
+        return new URL(window.location.href);
+    }
+
+    return new URL("https://www.notely.uk/noto-referral.html");
 }
 
 function shouldRetryMagicLinkWithoutRedirect(error) {
