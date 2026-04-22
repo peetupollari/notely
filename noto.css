@@ -1,3 +1,63 @@
+/* Download button (replaces waitlist) */
+.download-btn {
+    border: var(--border);
+    border-radius: 999px;
+    padding: 0.9rem 1.2rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background: var(--t-sb);
+    color: var(--text-i);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 100ms ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    isolation: isolate;
+    text-decoration: none;
+}
+
+.download-btn svg:first-child {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.download-btn .svg-icon {
+    width: 0px;
+    opacity: 0;
+    transition: 200ms ease;
+    padding-left: 3px;
+    flex-shrink: 0;
+}
+
+.download-btn:hover .svg-icon {
+    padding-left: 8px;
+    width: 18px;
+    opacity: 1;
+}
+
+.download-btn:active {
+    scale: 0.95;
+}
+
+.download-btn--disabled,
+.download-btn[aria-disabled="true"] {
+    opacity: 0.58;
+    cursor: not-allowed;
+}
+
+.purchase-link-note {
+    margin: 0.9rem 0 0;
+    color: var(--sub-text);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: center;
+}
 /* Hamburger menu for mobile */
 /* Hamburger menu styled like hero bg, right-aligned */
 .hamburger {

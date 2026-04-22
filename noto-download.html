@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Noto</title>
+    <link rel="icon" href="icons/notologo.svg" sizes="32x32">
+    <link rel="icon" type="image/x-icon" href="icons/notologo.svg">
+    <link rel="stylesheet" href="noto.css">
+    <link rel="stylesheet" href="noto-download.css">
+</head>
+<body class="grid-bg noto-download-page">
+    <main class="download-hero">
+        <div class="hero-background" aria-hidden="true">
+            <img class="hero-background-image" src="images/BlackWhiteBG.jpg" alt="">
+            <svg class="hero-background-grain" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+                <defs>
+                    <filter id="hero-grain-filter-download">
+                        <feTurbulence type="fractalNoise" baseFrequency="6" numOctaves="10" seed="7" result="turbulance"></feTurbulence>
+                        <feColorMatrix in="composite" type="luminanceToAlpha"></feColorMatrix>
+                        <feComponentTransfer in="grain">
+                            <feFuncR type="gamma" amplitude="1.15" exponent="0.72" offset="0"></feFuncR>
+                            <feFuncG type="gamma" amplitude="1.15" exponent="0.72" offset="0"></feFuncG>
+                            <feFuncB type="gamma" amplitude="1.15" exponent="0.72" offset="0"></feFuncB>
+                            <feFuncA type="table" tableValues="0 0.52"></feFuncA>
+                        </feComponentTransfer>
+                    </filter>
+                </defs>
+                <rect width="100" height="100" filter="url(#hero-grain-filter-download)"></rect>
+            </svg>
+        </div>
+
+        <section class="download-shell">
+            <section class="download-panel" id="download-auth-panel" aria-label="Download access">
+                <div class="download-panel-copy">
+                    <h2>Sign in with your Stripe email</h2>
+                    <p>Use the same email you entered during Stripe checkout. We will send a magic link there.</p>
+                </div>
+
+                <form class="waitlist-form download-form" id="download-auth-form" novalidate>
+                    <label class="sr-only" for="download-auth-email">Email address</label>
+                    <input
+                        id="download-auth-email"
+                        name="email"
+                        type="email"
+                        inputmode="email"
+                        autocomplete="email"
+                        placeholder="you@example.com"
+                        required
+                    >
+                    <button type="submit" id="download-auth-submit">Send magic link</button>
+                </form>
+
+                <p class="waitlist-status download-status" id="download-auth-status" role="status" aria-live="polite"></p>
+
+                <button type="button" class="download-btn" id="official-download-button" hidden>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="18px" width="18px" version="1.1" viewBox="0 0 452.986 452.986" xml:space="preserve" aria-hidden="true">
+                        <g>
+                            <g>
+                                <path style="fill:#ffffff;" d="M165.265,53.107L21.689,81.753v132.531l143.575-2.416V53.107 M431.297,245.583l-233.18-3.991v164.822l233.18,46.571V245.583 M165.265,241.097l-143.575-2.438v132.509l143.575,28.668V241.097 M431.297,0l-233.18,46.528v164.822l233.18-3.969V0"/>
+                            </g>
+                        </g>
+                    </svg>
+                    Download for Windows (64-bit)
+                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <g>
+                            <path class="svg" d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <rect x="4" y="17" width="16" height="2" rx="1" fill="#fff"/>
+                        </g>
+                    </svg>
+                </button>
+            </section>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="noto-download-config.js"></script>
+    <script src="noto-download.js"></script>
+</body>
+</html>

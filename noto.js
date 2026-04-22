@@ -1,4 +1,42 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const config = window.NOTO_DOWNLOAD_GATE_CONFIG ?? {};
+    const paymentLink = String(config.stripePaymentLink || "").trim();
+    const buttons = Array.from(document.querySelectorAll("[data-stripe-payment-link]"));
+    const statusLines = Array.from(document.querySelectorAll("[data-stripe-config-status]"));
+
+    if (!buttons.length) return;
+
+    const hasStripePaymentLink = /^https:\/\/(?:buy|checkout)\.stripe\.com\//i.test(paymentLink);
+
+    buttons.forEach((button) => {
+        if (!(button instanceof HTMLAnchorElement)) return;
+
+        if (hasStripePaymentLink) {
+            button.href = paymentLink;
+            button.target = "_blank";
+            button.rel = "noopener";
+            button.classList.remove("download-btn--disabled");
+            button.removeAttribute("aria-disabled");
+            return;
+        }
+
+        button.href = "#pricing";
+        button.classList.add("download-btn--disabled");
+        button.setAttribute("aria-disabled", "true");
+        button.addEventListener("click", (event) => {
+            event.preventDefault();
+        });
+    });
+
+    if (hasStripePaymentLink) return;
+
+    statusLines.forEach((line) => {
+        if (!(line instanceof HTMLElement)) return;
+        line.textContent = "Secure checkout is being configured right now. Please try again soon.";
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
     const forms = Array.from(document.querySelectorAll(".waitlist-form"));
     if (!forms.length) return;
     const waitlistCountElement = document.querySelector("[data-waitlist-count]");
