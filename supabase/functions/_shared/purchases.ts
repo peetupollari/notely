@@ -70,8 +70,6 @@ export async function upsertCheckoutSession(
             checkout_created_at: checkoutCreatedAt,
             paid_at: resolvedPaidAt,
             raw_checkout_session: session
-        }, {
-            onConflict: "stripe_checkout_session_id"
         });
 
     if (error) {
