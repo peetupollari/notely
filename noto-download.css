@@ -75,9 +75,37 @@
 }
 
 .download-form {
-    width: min(560px, 100%) !important;
-    flex-direction: column;
-    margin-top: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(560px, 100%);
+}
+
+.download-form input {
+    flex: 1;
+    min-width: 0;
+}
+
+.download-form button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.download-text-btn {
+    border: none;
+    background: transparent;
+    color: #ffffffc2;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+    margin-top: 0.8rem;
+}
+
+.download-text-btn:hover,
+.download-text-btn:focus-visible {
+    color: var(--text);
 }
 
 .download-status {

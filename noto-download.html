@@ -34,10 +34,10 @@
             <section class="download-panel" id="download-auth-panel" aria-label="Download access">
                 <div class="download-panel-copy">
                     <h2>Sign in with your Stripe email</h2>
-                    <p>Use the same email you entered during Stripe checkout. We will send a magic link there.</p>
+                    <p id="download-auth-copy">Use the same email you entered during Stripe checkout. We will send a magic link there.</p>
                 </div>
 
-                <form class="waitlist-form download-form" id="download-auth-form" novalidate>
+                <form class="download-form" id="download-auth-form" novalidate>
                     <label class="sr-only" for="download-auth-email">Email address</label>
                     <input
                         id="download-auth-email"
@@ -52,8 +52,15 @@
                 </form>
 
                 <p class="waitlist-status download-status" id="download-auth-status" role="status" aria-live="polite"></p>
+            </section>
 
-                <button type="button" class="download-btn" id="official-download-button" hidden>
+            <section class="download-panel" id="download-confirmed-panel" hidden aria-label="Download ready">
+                <div class="download-panel-copy">
+                    <h2>Your download is ready</h2>
+                    <p id="download-confirmed-copy">Click the button below to download your official Windows installer.</p>
+                </div>
+
+                <button type="button" class="download-btn" id="official-download-button">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="18px" width="18px" version="1.1" viewBox="0 0 452.986 452.986" xml:space="preserve" aria-hidden="true">
                         <g>
                             <g>
@@ -69,6 +76,10 @@
                         </g>
                     </svg>
                 </button>
+
+                <button type="button" class="download-text-btn" id="download-signout">Use another email</button>
+
+                <p class="waitlist-status download-status" id="download-confirmed-status" role="status" aria-live="polite"></p>
             </section>
         </section>
     </main>

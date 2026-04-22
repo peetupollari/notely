@@ -12,32 +12,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const elements = {
-        accessPanel: document.getElementById("download-access-panel"),
-        accessStatus: document.getElementById("download-access-status"),
         authCopy: document.getElementById("download-auth-copy"),
         authForm: document.getElementById("download-auth-form"),
         authInput: document.getElementById("download-auth-email"),
         authPanel: document.getElementById("download-auth-panel"),
         authStatus: document.getElementById("download-auth-status"),
         authSubmit: document.getElementById("download-auth-submit"),
-        buyLinks: Array.from(document.querySelectorAll("[data-buy-link]")),
+        confirmedCopy: document.getElementById("download-confirmed-copy"),
+        confirmedPanel: document.getElementById("download-confirmed-panel"),
+        confirmedStatus: document.getElementById("download-confirmed-status"),
         downloadButton: document.getElementById("official-download-button"),
-        loaderCopy: document.querySelector("#download-loader-panel .download-panel-copy"),
-        loaderPanel: document.getElementById("download-loader-panel"),
-        lockedCopy: document.getElementById("download-locked-copy"),
-        lockedPanel: document.getElementById("download-locked-panel"),
-        lockedSignOut: document.getElementById("download-locked-signout"),
-        lockedStatus: document.getElementById("download-locked-status"),
-        ownerEmail: document.getElementById("download-owner-email"),
-        refreshButton: document.getElementById("download-refresh-button"),
-        sessionBanner: document.getElementById("download-session-banner"),
-        sessionMessage: document.getElementById("download-session-message"),
         signOut: document.getElementById("download-signout"),
-        supportLink: document.getElementById("download-support-link")
     };
-
-    configureSupportLink(elements.supportLink, config.supportEmail);
-    configureBuyLinks(elements.buyLinks, config.stripePaymentLink);
 
     if (!window.supabase) {
         showAuthPanel();
@@ -52,7 +38,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         : "";
 
     let accessLoadToken = 0;
-    let sessionSyncSummary = { accessGranted: false, fromStripe: false, paymentStatus: "" };
 
     if (elements.authForm instanceof HTMLFormElement) {
         elements.authForm.addEventListener("submit", async (event) => {
@@ -87,29 +72,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    if (elements.lockedSignOut instanceof HTMLButtonElement) {
-        elements.lockedSignOut.addEventListener("click", async () => {
-            accessLoadToken += 1;
-            await supabase.auth.signOut();
-            showAuthPanel("Try the email you used during Stripe checkout.", "info");
-        });
-    }
-
-    if (elements.refreshButton instanceof HTMLButtonElement) {
-        elements.refreshButton.addEventListener("click", async () => {
-            const {
-                data: { session }
-            } = await supabase.auth.getSession();
-
-            if (!session) {
-                showAuthPanel("Your login expired. Sign in again to continue.", "error");
-                return;
-            }
-
-            await loadCurrentAccess(session);
-        });
-    }
-
     if (elements.downloadButton instanceof HTMLButtonElement) {
         elements.downloadButton.addEventListener("click", async () => {
             const {
@@ -123,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             elements.downloadButton.disabled = true;
             elements.downloadButton.innerHTML = "Preparing secure download...";
-            setStatus(elements.accessStatus, "Creating a short-lived official download link...", "info");
+            setStatus(elements.confirmedStatus, "Creating a short-lived official download link...", "info");
 
             try {
                 const payload = await invokeFunction(`${FUNCTIONS_BASE_URL}/create-download-link`, {
@@ -140,11 +102,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     throw new Error("The secure download link was missing from the response.");
                 }
 
-                setStatus(elements.accessStatus, "Your download is starting now.", "success");
+                setStatus(elements.confirmedStatus, "Your download is starting now.", "success");
                 window.location.assign(payload.url);
             } catch (error) {
                 console.error("Secure download link request failed:", error);
-                setStatus(elements.accessStatus, describeDownloadError(error), "error");
+                setStatus(elements.confirmedStatus, describeDownloadError(error), "error");
             } finally {
                 elements.downloadButton.disabled = false;
                 elements.downloadButton.innerHTML = defaultDownloadButtonContent;
@@ -152,11 +114,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    sessionSyncSummary = await syncStripeCheckoutSession();
-
     supabase.auth.onAuthStateChange((_event, session) => {
         if (session) {
             void loadCurrentAccess(session);
+        } else {
+            showAuthPanel();
         }
     });
 
@@ -171,51 +133,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     showAuthPanel();
 
-    async function syncStripeCheckoutSession() {
-        const sessionId = normalizeCheckoutSessionId(new URLSearchParams(window.location.search).get("session_id"));
-        if (!sessionId) {
-            setSessionBanner("Pay with Stripe, then come back here and sign in with that same email to unlock the official download.", "info");
-            return { accessGranted: false, fromStripe: false, paymentStatus: "" };
-        }
-
-        setSessionBanner("Checking your Stripe checkout now...", "info");
-
-        try {
-            const payload = await invokeFunction(`${FUNCTIONS_BASE_URL}/stripe-sync-session`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    apikey: SUPABASE_ANON_KEY
-                },
-                body: JSON.stringify({ sessionId })
-            });
-
-            if (payload?.accessGranted) {
-                setSessionBanner("Payment confirmed. Sign in with the same Stripe email to unlock the official download.", "success");
-            } else if (String(payload?.paymentStatus || "").toLowerCase() === "processing") {
-                setSessionBanner("Your checkout exists, but Stripe still shows the payment as processing. Sign in again after Stripe settles it.", "info");
-            } else {
-                setSessionBanner("We found your Stripe checkout. Sign in with the same email to continue.", "info");
-            }
-
-            stripCheckoutSessionIdFromUrl();
-
-            return {
-                accessGranted: Boolean(payload?.accessGranted),
-                fromStripe: true,
-                paymentStatus: String(payload?.paymentStatus || "")
-            };
-        } catch (error) {
-            console.error("Stripe session sync failed:", error);
-            setSessionBanner(describeSessionSyncError(error), "error");
-            return { accessGranted: false, fromStripe: true, paymentStatus: "" };
-        }
-    }
-
     async function loadCurrentAccess(session) {
         const currentToken = accessLoadToken + 1;
         accessLoadToken = currentToken;
-        showLoader("Checking your paid download access...");
 
         const userEmail = normalizeEmail(session?.user?.email ?? "");
         if (!userEmail) {
@@ -232,83 +152,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const access = unwrapSingleRow(data);
             if (access?.has_access) {
-                showAccessPanel(userEmail, access.paid_at ?? null);
+                showConfirmedPanel(userEmail, access.paid_at ?? null);
                 return;
             }
 
-            showLockedPanel(userEmail);
+            // No access, sign them out and show auth panel
+            await supabase.auth.signOut();
+            showAuthPanel("This email does not have paid download access. Please use the email you used during Stripe checkout.", "error");
         } catch (error) {
             console.error("Paid access lookup failed:", error);
             if (currentToken !== accessLoadToken) return;
-            showAuthPanel(describeAccessError(error), "error");
+            await supabase.auth.signOut();
+            showAuthPanel("Error checking access. Please try signing in again.", "error");
         }
     }
 
     function showAuthPanel(message = "", tone = "info") {
         showOnlyPanel(elements.authPanel);
-
-        if (elements.authCopy instanceof HTMLElement) {
-            elements.authCopy.textContent = sessionSyncSummary.accessGranted
-                ? "Stripe has already marked the checkout as paid. Sign in with the same email you used there and we will unlock the official download."
-                : "Use the same email you entered during Stripe checkout. We will send a magic link there.";
-        }
-
         setStatus(elements.authStatus, message, tone);
-        setStatus(elements.accessStatus, "");
-        setStatus(elements.lockedStatus, "");
     }
 
-    function showAccessPanel(email, paidAt = null) {
-        showOnlyPanel(elements.accessPanel);
-
-        if (elements.ownerEmail instanceof HTMLElement) {
-            elements.ownerEmail.textContent = email;
-        }
-
+    function showConfirmedPanel(email, paidAt = null) {
+        showOnlyPanel(elements.confirmedPanel);
+        
         if (paidAt) {
-            setStatus(elements.accessStatus, `Paid access confirmed ${formatTimestamp(paidAt)}.`, "success");
+            setStatus(elements.confirmedStatus, `Signed in as ${email}. Paid access confirmed ${formatTimestamp(paidAt)}.`, "success");
             return;
         }
 
-        setStatus(elements.accessStatus, "Paid access confirmed. Your secure download button is ready.", "success");
-    }
-
-    function showLockedPanel(email) {
-        showOnlyPanel(elements.lockedPanel);
-
-        if (elements.lockedCopy instanceof HTMLElement) {
-            elements.lockedCopy.textContent = sessionSyncSummary.accessGranted
-                ? `Signed in as ${email}, but Stripe already confirmed a paid checkout. This usually means you signed in with a different email than the one used in Stripe.`
-                : `Signed in as ${email}, but we could not match this email to a paid Stripe checkout yet. If you paid with another email, sign out and try that one instead.`;
-        }
-
-        setStatus(elements.lockedStatus, sessionSyncSummary.accessGranted
-            ? "Try the email used during Stripe checkout."
-            : "Buy Noto first or sign in with the email used in Stripe.", "info");
-    }
-
-    function showLoader(message = "Checking your access...") {
-        if (elements.loaderCopy instanceof HTMLElement) {
-            elements.loaderCopy.textContent = message;
-        }
-
-        showOnlyPanel(elements.loaderPanel);
+        setStatus(elements.confirmedStatus, `Signed in as ${email}. Your download is ready.`, "success");
     }
 
     function showOnlyPanel(activePanel) {
-        [elements.accessPanel, elements.authPanel, elements.loaderPanel, elements.lockedPanel].forEach((panel) => {
+        [elements.authPanel, elements.confirmedPanel].forEach((panel) => {
             if (!(panel instanceof HTMLElement)) return;
             panel.hidden = panel !== activePanel;
         });
-    }
-
-    function setSessionBanner(message, tone = "info") {
-        if (!(elements.sessionBanner instanceof HTMLElement) || !(elements.sessionMessage instanceof HTMLElement)) return;
-
-        elements.sessionBanner.hidden = false;
-        elements.sessionBanner.classList.remove("error", "success", "info");
-        elements.sessionBanner.classList.add(tone);
-        elements.sessionMessage.textContent = message;
     }
 });
 
@@ -487,16 +366,6 @@ function shouldRetryMagicLinkWithoutRedirect(error) {
     );
 }
 
-function stripCheckoutSessionIdFromUrl() {
-    const url = new URL(window.location.href);
-
-    if (!url.searchParams.has("session_id")) return;
-
-    url.searchParams.delete("session_id");
-    const replacementUrl = `${url.pathname}${url.search}${url.hash}`;
-    window.history.replaceState({}, document.title, replacementUrl);
-}
-
 function formatTimestamp(value) {
     const parsedDate = new Date(value);
     if (Number.isNaN(parsedDate.getTime())) return "recently";
@@ -529,37 +398,6 @@ function describeMagicLinkError(error) {
     }
 
     return `We could not send the magic link: ${message}`;
-}
-
-function describeSessionSyncError(error) {
-    const message = String(error?.message || "").toLowerCase();
-
-    if (!message) return "We could not verify your Stripe checkout right now.";
-    if (message.includes("session") && message.includes("not found")) {
-        return "We could not find that Stripe checkout session. Finish the payment first, then come back here from the Stripe redirect.";
-    }
-    if (message.includes("stripe")) {
-        return "Stripe verification failed right now. Give it a moment and try the download page again.";
-    }
-
-    return "We could not verify your Stripe checkout right now.";
-}
-
-function describeAccessError(error) {
-    const message = String(error?.message || "").toLowerCase();
-
-    if (!message) return "We could not check your paid access right now.";
-    if (message.includes("get_my_noto_download_access")) {
-        return "Supabase is missing the paid-download access function. Run the new SQL script first.";
-    }
-    if (message.includes("noto_download_purchases")) {
-        return "The paid-download table is missing in Supabase. Run the new SQL script first.";
-    }
-    if (message.includes("email_required")) {
-        return "We could not read your login email. Open the magic link again and try once more.";
-    }
-
-    return "We could not check your paid access right now.";
 }
 
 function describeDownloadError(error) {
