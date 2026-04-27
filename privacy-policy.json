@@ -1,0 +1,51 @@
+{
+  "name": "Privacy Policy",
+  "last_updated": "2026-04-27",
+  "service": "Noto",
+  "website": "https://www.notely.uk/noto.html",
+  "description": "Markdown-based note-taking application with optional cloud collaboration",
+
+  "data_controller": {
+    "name": "Noto",
+    "contact_email": "noto.support@gmail.com"
+  },
+
+  "data_collection": {
+    "account_data": ["email", "authentication data"],
+    "user_content": "Notes are stored locally by default. Notes are only stored in the cloud if the user explicitly enables collaboration features.",
+    "technical_data": ["IP address", "browser type", "device info", "timestamps"]
+  },
+
+  "data_usage": [
+    "Provide and maintain the service",
+    "Authenticate users",
+    "Enable collaboration features",
+    "Process payments",
+    "Improve application performance and security"
+  ],
+
+  "data_storage": {
+    "local_storage": "Notes are stored locally on the user's device by default",
+    "cloud_storage": "If collaboration is used, notes are stored in Supabase databases",
+    "third_parties": [
+      {
+        "name": "Supabase",
+        "purpose": "Authentication and cloud data storage"
+      },
+      {
+        "name": "Stripe",
+        "purpose": "Payment processing"
+      }
+    ]
+  },
+
+  "data_sharing": "We do not sell or share user data with third parties except as required to operate the service (Supabase and Stripe).",
+
+  "security": "We implement reasonable technical and organizational measures to protect user data, including encryption.",
+
+  "international_transfers": "Data may be processed in regions where Supabase or Stripe operate. Appropriate safeguards are used where required.",
+
+  "changes": "We may update this policy. Continued use of the service means you accept the updated policy.",
+
+  "contact": "noto.support@gmail.com"
+}

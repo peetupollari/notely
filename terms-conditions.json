@@ -1,0 +1,46 @@
+{
+  "name": "Terms and Conditions",
+  "last_updated": "2026-04-27",
+  "service": "Noto",
+  "website": "https://www.notely.uk/noto.html",
+
+  "acceptance": "By using Noto, you agree to these Terms.",
+
+  "service_description": "Noto is a markdown-based note-taking application with optional cloud collaboration features.",
+
+  "accounts": {
+    "requirement": "Users may need to create an account to access certain features.",
+    "responsibility": "Users are responsible for maintaining the confidentiality of their account."
+  },
+
+  "user_content": {
+    "ownership": "Users retain ownership of their notes.",
+    "responsibility": "Users are responsible for the content they create and share.",
+    "storage": "Notes are stored locally unless the user enables collaboration features."
+  },
+
+  "acceptable_use": [
+    "Do not use the service for illegal activities",
+    "Do not attempt to hack or disrupt the service",
+    "Do not upload harmful or malicious content"
+  ],
+
+  "payments": {
+    "processor": "Stripe",
+    "terms": "All payments are processed securely via Stripe.",
+    "refund_policy": "All sales are final. No refunds will be issued."
+  },
+
+  "service_availability": "We do not guarantee uninterrupted service and may modify or discontinue features at any time.",
+
+  "termination": {
+    "by_user": "Users may stop using the service at any time.",
+    "by_service": "We may suspend or terminate accounts that violate these terms."
+  },
+
+  "limitation_of_liability": "The service is provided 'as is' without warranties. We are not liable for data loss, service interruptions, or damages.",
+
+  "changes": "We may update these Terms. Continued use means acceptance of the updated Terms.",
+
+  "contact": "noto.support@gmail.com"
+}
