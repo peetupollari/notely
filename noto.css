@@ -429,6 +429,10 @@ b {
     text-align: center;
 }
 
+.changelog-titlebar{
+    color: var(--text) !important;
+}
+
 .titlebar-links a:hover,
 .titlebar-links a:focus-visible,
 .titlebar-links a.active {
@@ -1997,6 +2001,167 @@ b {
     color: var(--sub-text);
 }
 /* --------------------------------- Contact --------------------------------- */
+
+/* --------------------------------- Changelog --------------------------------- */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.changelog-section {
+    padding: 8rem 2rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex: 1;
+}
+
+.changelog-container {
+    display: flex;
+    gap: 2rem;
+}
+
+.changelog-sidebar {
+    width: 250px;
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+}
+
+.current-version {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+.version-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.version-item {
+    padding: 0.5rem 0;
+    cursor: pointer;
+    color: var(--text);
+    opacity: 0.7;
+    transition: opacity 0.2s ease, color 0.2s ease;
+    position: relative;
+    width: fit-content;
+    user-select: none;
+}
+
+.version-item::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-10px);
+    opacity: 0;
+    width: 12px;
+    height: 12px;
+    background-image: url("data:image/svg+xml,%3csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M4 2L8 6L4 10' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3e%3c/svg%3e");
+    background-size: contain;
+    background-repeat: no-repeat;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.version-item.active::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+.version-item:hover {
+    opacity: 1;
+    color: white;
+}
+
+.version-item.active {
+    opacity: 1;
+    color: white;
+}
+
+.changelog-content {
+    flex: 1;
+    min-height: 400px;
+}
+
+.changelog-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+.changelog-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.changelog-section-item .section-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.changelog-section-item h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.changelog-section-item p {
+    color: var(--sub-text);
+    line-height: 1.6;
+}
+
+/* Footer bottom styles (copied from noto.html) */
+.footer-bottom {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.footer-nav-list {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.footer-list-heading {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-list li {
+    margin-bottom: 0.25rem;
+}
+
+.footer-list a {
+    color: var(--sub-text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-list a:hover {
+    color: white;
+}
+/* --------------------------------- Changelog --------------------------------- */
 
 @media (max-width: 1280px) {
     .pricing {

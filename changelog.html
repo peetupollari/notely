@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="icons/notologo.svg" sizes="32x32">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="noto.css"/>
+    <title>Changelog - Noto</title>
+    <link rel="icon" type="Image/x-icon" href="icons/notologo.svg">
+</head>
+
+<body class="grid-bg">
+    <div class="titlebar">
+        <a href="noto.html"><img class="titlebar-img" src="images/notologo.png"></a>
+        <button class="hamburger" id="hamburger" aria-label="Open navigation" aria-controls="main-nav" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="titlebar-links" id="main-nav">
+          <a href="noto.html#features-stage">About</a>
+          <a href="noto.html#pricing">Pricing</a>
+          <a href="noto.html#footer">Contact</a>
+          <a href="changelog.html" class="changelog-titlebar">Changelog</a>
+          <div class="titlebar-indicator"></div>
+        </div>
+        <div class="titlebar-empty"></div>
+    </div>
+
+    <section class="changelog-section">
+        <div class="changelog-container">
+            <div class="changelog-sidebar">
+                <h1 class="current-version">Loading...</h1>
+                <ul class="version-list">
+                    <!-- Versions will be loaded here -->
+                </ul>
+            </div>
+            <div class="changelog-content" id="changelog-content">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-bottom">
+        <nav class="footer-nav-list" aria-label="Footer navigation">
+          <div class="footer-list-heading">Navigation</div>
+          <ul class="footer-list">
+            <li><a href="noto.html#hero">Home</a></li>
+            <li><a href="noto.html#features-stage">Features</a></li>
+            <li><a href="noto.html#pricing">Pricing</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-nav-list" aria-label="Legal navigation">
+          <div class="footer-list-heading">Legal</div>
+          <ul class="footer-list">
+            <li><a href="privacy.html" target="_blank" rel="noreferrer">Privacy Policy</a></li>
+            <li><a href="terms.html" target="_blank" rel="noreferrer">Terms &amp; Conditions</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-socials-list">
+          <div class="footer-list-heading">Follow us</div>
+          <ul class="footer-list">
+            <li><a href="https://x.com/Noto_notes" target="_blank">X (Twitter)</a></li>
+            <li><a href="https://www.instagram.com/noto_notes_/" target="_blank">Instagram</a></li>
+          </ul>
+        </nav>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Changelog functionality
+        const versionList = document.querySelector('.version-list');
+        const contentDiv = document.getElementById('changelog-content');
+        const currentVersionEl = document.querySelector('.current-version');
+        let changelogData = {};
+        let availableVersions = [];
+
+        // Possible versions to check (add more as needed)
+        const possibleVersions = ['v0.1.6', 'v0.1.7', 'v0.1.8', 'v0.1.9', 'v0.2.0'];
+
+        // Load changelog data for all available versions
+        async function loadChangelog() {
+            for (const version of possibleVersions) {
+                try {
+                    const response = await fetch(`changelog/${version}.json`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        changelogData[version] = data;
+                        availableVersions.push(version);
+                    }
+                } catch (error) {
+                    // Version not found, skip
+                }
+            }
+
+            if (availableVersions.length > 0) {
+                // Sort versions (simple sort, assuming v0.x.x format)
+                availableVersions.sort((a, b) => {
+                    const aParts = a.slice(1).split('.').map(Number);
+                    const bParts = b.slice(1).split('.').map(Number);
+                    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+                        const aVal = aParts[i] || 0;
+                        const bVal = bParts[i] || 0;
+                        if (aVal !== bVal) return bVal - aVal; // Descending
+                    }
+                    return 0;
+                });
+
+                // Update current version to latest
+                const latestVersion = availableVersions[0];
+                currentVersionEl.textContent = latestVersion;
+
+                // Populate version list
+                versionList.innerHTML = '';
+                availableVersions.forEach(version => {
+                    const li = document.createElement('li');
+                    li.className = 'version-item';
+                    li.dataset.version = version;
+                    li.textContent = version;
+                    versionList.appendChild(li);
+                });
+
+                // Set first (latest) as active
+                const firstItem = versionList.querySelector('.version-item');
+                if (firstItem) {
+                    firstItem.classList.add('active');
+                    displayVersion(latestVersion);
+                }
+            }
+        }
+
+        // Display version content
+        function displayVersion(version) {
+            const data = changelogData[version];
+            if (!data) return;
+
+            let html = `<h2>${data.updateNumber} - ${data.updateDate}</h2>`;
+            if (data.sections && data.sections.length > 0) {
+                html += '<div class="changelog-sections">';
+                data.sections.forEach(section => {
+                    html += `
+                        <div class="changelog-section-item">
+                            <div class="section-number">${section.number}</div>
+                            <h3>${section.heading}</h3>
+                            <p>${section.paragraph}</p>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            contentDiv.innerHTML = html;
+        }
+
+        // Handle version click
+        versionList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('version-item')) {
+                const version = e.target.dataset.version;
+                // Remove active from all
+                document.querySelectorAll('.version-item').forEach(item => item.classList.remove('active'));
+                // Add active to clicked
+                e.target.classList.add('active');
+                displayVersion(version);
+            }
+        });
+
+        // Load on page load
+        loadChangelog();
+    </script>
+</body>
