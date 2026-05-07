@@ -1,0 +1,14 @@
+{
+  "alwaysShow": false,
+  "updateNumber": "v0.1.71",
+  "updateDate": "07/05/2026",
+  "intro": {
+  },
+  "sections": [
+    {
+      "number": "01",
+      "heading": "Bug fixes",
+      "paragraph": "Stripe payment link has been updated to the correct one."
+    }
+  ]
+}
